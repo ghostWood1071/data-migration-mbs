@@ -23,7 +23,7 @@ with DAG(
 
     create_delta_job = SparkSubmitOperator(
         task_id="create_delta_job",
-        application="local:///opt/spark/app/create-sample-value-job.py",
+        application="s3a://asset/spark-jobs/create-sample-value-job.py",
         deploy_mode="cluster",
         name="spark-delta-create",
         conn_id="spark_k8s",
