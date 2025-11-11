@@ -1,6 +1,5 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import current_timestamp
-from config import Database as DATABASE_CONFIG
 
 spark = (
     SparkSession.builder
