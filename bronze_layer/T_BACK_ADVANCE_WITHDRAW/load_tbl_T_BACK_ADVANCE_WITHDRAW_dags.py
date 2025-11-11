@@ -4,15 +4,6 @@ from datetime import datetime
 
 default_args = {"owner": "airflow", "retries": 0}
 
-# Maven coordinates (Spark sẽ tự tải)
-# PACKAGES = ",".join([
-#     "io.delta:delta-spark_2.12:3.2.0",
-#     "org.apache.hadoop:hadoop-aws:3.3.4",
-#     "org.postgresql:postgresql:42.7.3",
-#     "org.apache.hive:hive-metastore:3.1.3",
-#     "org.apache.hive:hive-exec:3.1.3"
-# ])
-
 with DAG(
     dag_id="spark_process_bronze_layer",
     start_date=datetime(2025, 10, 19),
@@ -22,16 +13,15 @@ with DAG(
 ) as dag:
 
     process_bronze_layer = SparkSubmitOperator(
-        task_id="process_bronze_layer",
-        application="s3a://asset/spark-jobs/process-bronze-layer.py",
+        task_id="process_bronze_layer_tbl_T_BACK_ADVANCE_WITHDRAW",
+        application="s3a://asset/spark-jobs/load_tbl_T_BACK_ADVANCE_WITHDRAW.py",
         deploy_mode="cluster",
-        name="spark-process-bronze",
+        name="spark-process-bronze_tbl_T_BACK_ADVANCE_WITHDRAW",
         conn_id="spark_k8s",
         conf={
             "spark.kubernetes.namespace": "compute",
             "spark.kubernetes.container.image": "ghostwood/mbs-spark:1.0.1-oracle",
             "spark.kubernetes.authenticate.driver.serviceAccountName": "spark",
-            # "spark.jars.packages": PACKAGES,
             "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
             "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog",
             "spark.sql.catalogImplementation": "hive",
