@@ -1,0 +1,3 @@
+from common_functions import write_source_from_bronze_to_silver_table
+
+write_source_from_bronze_to_silver_table()
