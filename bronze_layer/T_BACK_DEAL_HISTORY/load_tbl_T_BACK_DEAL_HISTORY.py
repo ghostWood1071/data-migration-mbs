@@ -13,11 +13,11 @@ spark = (
 
 ###---------------------------------READ DATA FROM ORACLE DB---------------------------------
 #
-T_BACK_ADVANCE_WITHDRAW_df = (
+T_BACK_DEAL_HISTORY_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG["url"])
-        .option("dbtable", "BACK.T_BACK_ADVANCE_WITHDRAW")
+        .option("dbtable", "BACK.T_BACK_DEAL_HISTORY")
         .option("user", DATABASE_CONFIG["user"])
         .option("password", DATABASE_CONFIG["password"])
         .option("driver", DATABASE_CONFIG["driver"])
@@ -28,7 +28,7 @@ T_BACK_ADVANCE_WITHDRAW_df = (
 
 ###---------------------------------WRITE DATA TO BRONZE BUCKET IN MINIO---------------------------------
 #
-T_BACK_ADVANCE_WITHDRAW_df.write.format("parquet").mode("overwrite").save("s3a://warehouse/bronze/T_BACK_ADVANCE_WITHDRAW")
+T_BACK_DEAL_HISTORY_df.write.format("parquet").mode("overwrite").save("s3a://warehouse/bronze/T_BACK_DEAL_HISTORY")
 #
 ###
 
