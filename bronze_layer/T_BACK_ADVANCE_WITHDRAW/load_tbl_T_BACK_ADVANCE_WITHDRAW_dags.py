@@ -15,7 +15,6 @@ with DAG(
     process_bronze_layer = SparkSubmitOperator(
         task_id="process_bronze_layer_tbl_T_BACK_ADVANCE_WITHDRAW",
         application="s3a://asset/spark-jobs/load_tbl_T_BACK_ADVANCE_WITHDRAW.py",
-        py_files="s3a://asset/libraries/common_functions.zip",
         deploy_mode="cluster",
         name="spark-process-bronze_tbl_T_BACK_ADVANCE_WITHDRAW",
         conn_id="spark_k8s",
