@@ -24,7 +24,7 @@ T_BACK_ADVANCE_WITHDRAW_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG_DICT["url"])
-        .option("dbtable", "BACK.T_BACK_ADVANCE_WITHDRAW")
+        .option("dbtable", "T_BACK_ADVANCE_WITHDRAW")
         .option("user", DATABASE_CONFIG_DICT["user"])
         .option("password", DATABASE_CONFIG_DICT["password"])
         .option("driver", DATABASE_CONFIG_DICT["driver"])
@@ -35,7 +35,7 @@ T_BACK_DEAL_HISTORY_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG_DICT["url"])
-        .option("dbtable", "BACK.T_BACK_DEAL_HISTORY")
+        .option("dbtable", "T_BACK_DEAL_HISTORY")
         .option("user", DATABASE_CONFIG_DICT["user"])
         .option("password", DATABASE_CONFIG_DICT["password"])
         .option("driver", DATABASE_CONFIG_DICT["driver"])
@@ -46,7 +46,7 @@ T_FRONT_DEAL_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG_DICT["url"])
-        .option("dbtable", "FRONT.T_FRONT_DEAL")
+        .option("dbtable", "T_FRONT_DEAL")
         .option("user", DATABASE_CONFIG_DICT["user"])
         .option("password", DATABASE_CONFIG_DICT["password"])
         .option("driver", DATABASE_CONFIG_DICT["driver"])
@@ -57,7 +57,7 @@ T_LIST_BRANCH_BANK_ADV_WDR_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG_DICT["url"])
-        .option("dbtable", "BACK.T_LIST_BRANCH_BANK_ADV_WDR")
+        .option("dbtable", "T_LIST_BRANCH_BANK_ADV_WDR")
         .option("user", DATABASE_CONFIG_DICT["user"])
         .option("password", DATABASE_CONFIG_DICT["password"])
         .option("driver", DATABASE_CONFIG_DICT["driver"])
@@ -68,7 +68,7 @@ T_MARGIN_EXTRA_BALANCE_HIS_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG_DICT["url"])
-        .option("dbtable", "BACK.T_MARGIN_EXTRA_BALANCE_HIS")
+        .option("dbtable", "T_MARGIN_EXTRA_BALANCE_HIS")
         .option("user", DATABASE_CONFIG_DICT["user"])
         .option("password", DATABASE_CONFIG_DICT["password"])
         .option("driver", DATABASE_CONFIG_DICT["driver"])
@@ -79,7 +79,7 @@ T_TLO_DEBIT_BALANCE_HISTORY_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG_DICT["url"])
-        .option("dbtable", "BACK.T_TLO_DEBIT_BALANCE_HISTORY")
+        .option("dbtable", "T_TLO_DEBIT_BALANCE_HISTORY")
         .option("user", DATABASE_CONFIG_DICT["user"])
         .option("password", DATABASE_CONFIG_DICT["password"])
         .option("driver", DATABASE_CONFIG_DICT["driver"])
@@ -90,7 +90,7 @@ V_T_BACK_ACCOUNT_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG_DICT["url"])
-        .option("dbtable", "BACK.V_T_BACK_ACCOUNT")
+        .option("dbtable", "V_T_BACK_ACCOUNT")
         .option("user", DATABASE_CONFIG_DICT["user"])
         .option("password", DATABASE_CONFIG_DICT["password"])
         .option("driver", DATABASE_CONFIG_DICT["driver"])
@@ -101,7 +101,7 @@ V_T_ERC_MONTHLY_DETAIL_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG_DICT["url"])
-        .option("dbtable", "BACK.V_T_ERC_MONTHLY_DETAIL")
+        .option("dbtable", "V_T_ERC_MONTHLY_DETAIL")
         .option("user", DATABASE_CONFIG_DICT["user"])
         .option("password", DATABASE_CONFIG_DICT["password"])
         .option("driver", DATABASE_CONFIG_DICT["driver"])
@@ -112,7 +112,7 @@ V_T_LIST_FRONT_USER_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG_DICT["url"])
-        .option("dbtable", "BACK.V_T_LIST_FRONT_USER")
+        .option("dbtable", "V_T_LIST_FRONT_USER")
         .option("user", DATABASE_CONFIG_DICT["user"])
         .option("password", DATABASE_CONFIG_DICT["password"])
         .option("driver", DATABASE_CONFIG_DICT["driver"])
