@@ -11,6 +11,14 @@ spark = (
     .getOrCreate()
 )
 
+#database config to connect
+DATABASE_CONFIG = {
+    "url": "jdbc:oracle:thin:@10.91.101.161:1521/tradingnkt",
+    "user": "mispoc",
+    "password": "d8daa822c8b0c6f9d85",
+    "driver": "oracle.jdbc.driver.OracleDriver"
+}
+
 ###---------------------------------READ DATA FROM ORACLE DB---------------------------------
 #
 T_BACK_ADVANCE_WITHDRAW_df = (
