@@ -15,6 +15,7 @@ with DAG(
     process_bronze_layer = SparkSubmitOperator(
         task_id="process_bronze_layer_view_V_T_ERC_MONTHLY_DETAIL",
         application="s3a://asset/spark-jobs/load_view_V_T_ERC_MONTHLY_DETAIL.py",
+        py_files="s3a://asset/libraries/common_functions.py",
         deploy_mode="cluster",
         name="spark-process-bronze_view_V_T_ERC_MONTHLY_DETAIL",
         conn_id="spark_k8s",

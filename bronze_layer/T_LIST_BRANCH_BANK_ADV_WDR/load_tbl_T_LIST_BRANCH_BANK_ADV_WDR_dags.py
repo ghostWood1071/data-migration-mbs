@@ -15,6 +15,7 @@ with DAG(
     process_bronze_layer = SparkSubmitOperator(
         task_id="process_bronze_layer_tbl_T_LIST_BRANCH_BANK_ADV_WDR",
         application="s3a://asset/spark-jobs/load_tbl_T_LIST_BRANCH_BANK_ADV_WDR.py",
+        py_files="s3a://asset/libraries/common_functions.py",
         deploy_mode="cluster",
         name="spark-process-bronze_tbl_T_LIST_BRANCH_BANK_ADV_WDR",
         conn_id="spark_k8s",
