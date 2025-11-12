@@ -14,7 +14,7 @@ spark = (
 source_df = (
     spark.read
         .format("parquet")
-        .load("s3a://warehouse/bronze/T_BACK_ADVANCE_WITHDRAW")
+        .load("s3a://warehouse/bronze/V_T_LIST_FRONT_USER")
 )
 #
 ###
@@ -24,10 +24,11 @@ source_df = (
 #
 # source_df.withColumn("partiton_date", date_format("C_WITHDRAW_DATE", "yyyy-MM-dd"))
 (
-    source_df.withColumn("partiton_date", to_date("C_WITHDRAW_DATE", "yyyy-MM-dd"))
+    source_df.withColumn("partiton_date", to_date("C_DATE_CREATE", "yyyy-MM-dd"))
                                 .withColumn("valid_from", current_timestamp())
                                 .withColumn("valid_to", None)
                                 .withColumn("is_current", True)
+                                .withColumn("create_at", current_timestamp())
 )
 #
 
@@ -45,8 +46,8 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
     source_df.write.format("delta")
                     .mode("overwrite")
                     .partitionBy("partition_date")
-                    .option("path", "s3a://warehouse/bronze/T_BACK_ADVANCE_WITHDRAW")
-                    .saveAsTable("silver.fact_T_BACK_ADVANCE_WITHDRAW")
+                    .option("path", "s3a://warehouse/silver/V_T_LIST_FRONT_USER")
+                    .saveAsTable("silver.dim_V_T_LIST_FRONT_USER")
 )
 #
 ###
