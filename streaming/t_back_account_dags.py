@@ -20,7 +20,7 @@ with DAG(
         conn_id="spark_k8s",
         conf={
             "spark.kubernetes.namespace": "compute",
-            "spark.kubernetes.container.image": "ghostwood/mbs-spark:1.0.0",
+            "spark.kubernetes.container.image": "ghostwood/mbs-spark:1.0.3-streaming",
             "spark.kubernetes.authenticate.driver.serviceAccountName": "spark",
             "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
             "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog",
