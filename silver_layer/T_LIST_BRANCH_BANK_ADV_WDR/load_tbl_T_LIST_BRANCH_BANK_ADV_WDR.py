@@ -1,41 +1,53 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import current_timestamp
+from pyspark.sql.functions import current_timestamp, date_format, to_date
 
 spark = (
     SparkSession.builder
     .appName("CreateDeltaTables")
-    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
-    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
     .enableHiveSupport()
     .getOrCreate()
 )
 
-#database config to connect
-DATABASE_CONFIG = {
-    "url": "jdbc:oracle:thin:@10.91.101.161:1521/tradingnkt",
-    "user": "mispoc",
-    "password": "d8daa822c8b0c6f9d85",
-    "driver": "oracle.jdbc.driver.OracleDriver"
-}
 
-###---------------------------------READ DATA FROM ORACLE DB---------------------------------
+###---------------------------------READ DATA FROM BRONZE---------------------------------
 #
-T_LIST_BRANCH_BANK_ADV_WDR_df = (
+source_df = (
     spark.read
-        .format("jdbc")
-        .option("url", DATABASE_CONFIG["url"])
-        .option("dbtable", "BACK.T_LIST_BRANCH_BANK_ADV_WDR")
-        .option("user", DATABASE_CONFIG["user"])
-        .option("password", DATABASE_CONFIG["password"])
-        .option("driver", DATABASE_CONFIG["driver"])
-        .load()
+        .format("parquet")
+        .load("s3a://warehouse/bronze/T_BACK_ADVANCE_WITHDRAW")
 )
 #
 ###
 
-###---------------------------------WRITE DATA TO BRONZE BUCKET IN MINIO---------------------------------
+
+###---------------------------------ADD TECHNIQUE COLUMN---------------------------------
 #
-T_LIST_BRANCH_BANK_ADV_WDR_df.write.format("parquet").mode("overwrite").save("s3a://warehouse/bronze/T_LIST_BRANCH_BANK_ADV_WDR")
+# source_df.withColumn("partiton_date", date_format("C_WITHDRAW_DATE", "yyyy-MM-dd"))
+(
+    source_df.withColumn("partiton_date", to_date("C_WITHDRAW_DATE", "yyyy-MM-dd"))
+                                .withColumn("valid_from", current_timestamp())
+                                .withColumn("valid_to", None)
+                                .withColumn("is_current", True)
+)
+#
+
+
+###---------------------------------CREATE DATABASES---------------------------------
+#
+spark.sql("CREATE DATABASE IF NOT EXISTS silver")
+spark.sql("CREATE DATABASE IF NOT EXISTS gold")
+#
+
+
+###---------------------------------WRITE TABLE TO SILVER BUCKET IN MINIO---------------------------------
+#
+(
+    source_df.write.format("delta")
+                    .mode("overwrite")
+                    .partitionBy("partition_date")
+                    .option("path", "s3a://warehouse/bronze/T_BACK_ADVANCE_WITHDRAW")
+                    .saveAsTable("silver.fact_T_BACK_ADVANCE_WITHDRAW")
+)
 #
 ###
 

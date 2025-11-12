@@ -14,7 +14,7 @@ spark = (
 source_df = (
     spark.read
         .format("parquet")
-        .load("s3a://warehouse/bronze/T_BACK_DEAL_HISTORY")
+        .load("s3a://warehouse/bronze/T_BACK_ADVANCE_WITHDRAW")
 )
 #
 ###
@@ -45,8 +45,8 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
     source_df.write.format("delta")
                     .mode("overwrite")
                     .partitionBy("partition_date")
-                    .option("path", "s3a://warehouse/bronze/T_BACK_DEAL_HISTORY")
-                    .saveAsTable("silver.fact_T_BACK_DEAL_HISTORY")
+                    .option("path", "s3a://warehouse/bronze/T_BACK_ADVANCE_WITHDRAW")
+                    .saveAsTable("silver.fact_T_BACK_ADVANCE_WITHDRAW")
 )
 #
 ###
