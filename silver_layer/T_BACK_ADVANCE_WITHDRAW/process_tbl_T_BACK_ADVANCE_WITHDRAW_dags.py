@@ -33,7 +33,7 @@ with DAG(
             "spark.hadoop.fs.s3a.path.style.access": "true",
             "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
             "spark.sql.sources.partitionOverwriteMode": "dynamic",
-            "conf spark.eventLog.dir": "s3a://spark-logs/events",
+            "spark.eventLog.dir": "s3a://spark-logs/events",
             "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp",
             
             # # 🧠 Cấu hình CPU, RAM cho driver và executor
