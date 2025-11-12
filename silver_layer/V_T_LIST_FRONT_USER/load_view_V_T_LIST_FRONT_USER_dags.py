@@ -5,19 +5,18 @@ from datetime import datetime
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
-    dag_id="spark_process_bronze_layer_view_V_T_ERC_MONTHLY_DETAIL",
+    dag_id="spark_process_bronze_layer_view_V_T_LIST_FRONT_USER",
     start_date=datetime(2025, 10, 19),
     schedule_interval=None,
     catchup=False,
     tags=["spark", "delta", "hive"]
 ) as dag:
 
-    process_silver_layer = SparkSubmitOperator(
-        task_id="process_silver_layer_view_V_T_ERC_MONTHLY_DETAIL",
-        application="s3a://asset/spark-jobs/load_view_V_T_ERC_MONTHLY_DETAIL.py",
-        py_files="s3a://asset/libraries/common_functions.py",
+    process_bronze_layer = SparkSubmitOperator(
+        task_id="process_bronze_layer_view_V_T_LIST_FRONT_USER",
+        application="s3a://asset/spark-jobs/load_view_V_T_LIST_FRONT_USER.py",
         deploy_mode="cluster",
-        name="spark-process-silver_view_V_T_ERC_MONTHLY_DETAIL",
+        name="spark-process-bronze_view_V_T_LIST_FRONT_USER",
         conn_id="spark_k8s",
         conf={
             "spark.kubernetes.namespace": "compute",
@@ -40,4 +39,4 @@ with DAG(
         verbose=True
     )
 
-    process_silver_layer
+    process_bronze_layer

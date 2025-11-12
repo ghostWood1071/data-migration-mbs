@@ -5,19 +5,18 @@ from datetime import datetime
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
-    dag_id="spark_process_silver_layer_tbl_T_BACK_ADVANCE_WITHDRAW",
+    dag_id="spark_process_bronze_layer_tbl_T_MARGIN_EXTRA_BALANCE_HIS",
     start_date=datetime(2025, 10, 19),
     schedule_interval=None,
     catchup=False,
     tags=["spark", "delta", "hive"]
 ) as dag:
 
-    process_silver_layer = SparkSubmitOperator(
-        task_id="process_silver_layer_tbl_T_BACK_ADVANCE_WITHDRAW",
-        application="s3a://asset/spark-jobs/load_tbl_T_BACK_ADVANCE_WITHDRAW.py",
-        py_files="s3a://asset/libraries/common_functions.py",
+    process_bronze_layer = SparkSubmitOperator(
+        task_id="process_bronze_layer_tbl_T_MARGIN_EXTRA_BALANCE_HIS",
+        application="s3a://asset/spark-jobs/load_tbl_T_MARGIN_EXTRA_BALANCE_HIS.py",
         deploy_mode="cluster",
-        name="spark-process-silver_tbl_T_BACK_ADVANCE_WITHDRAW",
+        name="spark-process-bronze_tbl_T_MARGIN_EXTRA_BALANCE_HIS",
         conn_id="spark_k8s",
         conf={
             "spark.kubernetes.namespace": "compute",
@@ -35,16 +34,9 @@ with DAG(
             "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
             "spark.sql.sources.partitionOverwriteMode": "dynamic",
             "conf spark.eventLog.dir": "s3a://spark-logs/events",
-            "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp",
-            
-            # # 🧠 Cấu hình CPU, RAM cho driver và executor
-            # "spark.driver.cores": "1",
-            # "spark.driver.memory": "2g",
-            # "spark.executor.cores": "2",
-            # "spark.executor.memory": "4g",
-            # "spark.executor.instances": "3",  # số executor
+            "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp"
         },
         verbose=True
     )
 
-    process_silver_layer
+    process_bronze_layer

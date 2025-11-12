@@ -5,19 +5,18 @@ from datetime import datetime
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
-    dag_id="spark_process_silver_layer_tbl_T_MARGIN_EXTRA_BALANCE_HIS",
+    dag_id="spark_process_bronze_layer_tbl_T_LIST_BRANCH_BANK_ADV_WDR",
     start_date=datetime(2025, 10, 19),
     schedule_interval=None,
     catchup=False,
     tags=["spark", "delta", "hive"]
 ) as dag:
 
-    process_silver_layer = SparkSubmitOperator(
-        task_id="process_silver_layer_tbl_T_MARGIN_EXTRA_BALANCE_HIS",
-        application="s3a://asset/spark-jobs/load_tbl_T_MARGIN_EXTRA_BALANCE_HIS.py",
-        py_files="s3a://asset/libraries/common_functions.py",
+    process_bronze_layer = SparkSubmitOperator(
+        task_id="process_bronze_layer_tbl_T_LIST_BRANCH_BANK_ADV_WDR",
+        application="s3a://asset/spark-jobs/load_tbl_T_LIST_BRANCH_BANK_ADV_WDR.py",
         deploy_mode="cluster",
-        name="spark-process-silver_tbl_T_MARGIN_EXTRA_BALANCE_HIS",
+        name="spark-process-bronze_tbl_T_LIST_BRANCH_BANK_ADV_WDR",
         conn_id="spark_k8s",
         conf={
             "spark.kubernetes.namespace": "compute",
@@ -40,4 +39,4 @@ with DAG(
         verbose=True
     )
 
-    process_silver_layer
+    process_bronze_layer
