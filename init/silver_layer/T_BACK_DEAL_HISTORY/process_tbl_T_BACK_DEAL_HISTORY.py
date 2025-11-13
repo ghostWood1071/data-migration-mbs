@@ -53,7 +53,7 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
 spark.sql("DROP TABLE IF EXISTS silver.fact_T_BACK_DEAL_HISTORY")
 
 spark.sql("""
-    CREATE OR REPLACE TABLE silver.fact_T_BACK_DEAL_HISTORY
+    CREATE TABLE IF NOT EXISTS silver.fact_T_BACK_DEAL_HISTORY
     USING delta
     LOCATION 's3a://warehouse/silver/T_BACK_DEAL_HISTORY'
 """)

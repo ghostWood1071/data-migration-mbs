@@ -55,7 +55,7 @@ spark.sql("DROP TABLE IF EXISTS silver.fact_T_MARGIN_EXTRA_BALANCE_HIS")
 
 
 spark.sql("""
-    CREATE OR REPLACE TABLE silver.fact_T_MARGIN_EXTRA_BALANCE_HIS
+    CREATE TABLE IF NOT EXISTS silver.fact_T_MARGIN_EXTRA_BALANCE_HIS
     USING delta
     LOCATION 's3a://warehouse/silver/T_MARGIN_EXTRA_BALANCE_HIS'
 """)

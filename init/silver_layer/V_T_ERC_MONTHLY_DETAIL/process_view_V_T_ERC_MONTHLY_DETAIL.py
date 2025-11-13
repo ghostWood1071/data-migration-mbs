@@ -54,7 +54,7 @@ spark.sql("DROP TABLE IF EXISTS silver.fact_V_T_ERC_MONTHLY_DETAIL")
 
 
 spark.sql("""
-    CREATE OR REPLACE TABLE silver.fact_V_T_ERC_MONTHLY_DETAIL
+    CREATE TABLE IF NOT EXISTS silver.fact_V_T_ERC_MONTHLY_DETAIL
     USING delta
     LOCATION 's3a://warehouse/silver/V_T_ERC_MONTHLY_DETAIL'
 """)
