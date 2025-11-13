@@ -20,6 +20,7 @@ with DAG(
         conn_id="spark_k8s",
         conf={
             "spark.kubernetes.driver.hostNetwork":"true",
+            "spark.kubernetes.driver.dnsPolicy":"ClusterFirstWithHostNet",
             "spark.kubernetes.executor.hostNetwork":"true",
             "spark.kubernetes.executor.dnsPolicy":"ClusterFirstWithHostNet",
             "spark.kubernetes.namespace": "compute",
