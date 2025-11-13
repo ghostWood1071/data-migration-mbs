@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import current_timestamp, date_format, to_date, lit
+from pyspark.sql.types import TimestampType
 
 spark = (
     SparkSession.builder
@@ -14,7 +15,7 @@ spark = (
 source_df = (
     spark.read
         .format("parquet")
-        .load("s3a://warehouse/bronze/T_MARGIN_EXTRA_BALANCE_HIS")
+        .load("s3a://warehouse/bronze/T_LIST_BRANCH_BANK_ADV_WDR")
 )
 #
 ###
@@ -24,9 +25,8 @@ source_df = (
 #
 # source_df.withColumn("partiton_date", date_format("C_WITHDRAW_DATE", "yyyy-MM-dd"))
 silver_df = (
-    source_df.withColumn("partition_date", to_date("C_TRADING_DATE", "yyyy-MM-dd"))
-                                .withColumn("valid_from", current_timestamp())
-                                .withColumn("valid_to", lit(None))
+    source_df.withColumn("valid_from", current_timestamp())
+                                .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
                                 .withColumn("create_at", current_timestamp())
 )
@@ -45,15 +45,14 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
 (
     silver_df.write.format("delta")
                     .mode("overwrite")
-                    .partitionBy("partition_date")
-                    .option("path", "s3a://warehouse/silver/T_MARGIN_EXTRA_BALANCE_HIS")
+                    .option("path", "s3a://warehouse/silver/T_LIST_BRANCH_BANK_ADV_WDR")
                     .save()
 )
 
 spark.sql("""
-    CREATE TABLE IF NOT EXISTS silver.fact_T_MARGIN_EXTRA_BALANCE_HIS
+    CREATE OR REPLACE TABLE silver.dim_T_LIST_BRANCH_BANK_ADV_WDR
     USING delta
-    LOCATION 's3a://warehouse/silver/T_MARGIN_EXTRA_BALANCE_HIS'
+    LOCATION 's3a://warehouse/silver/T_LIST_BRANCH_BANK_ADV_WDR'
 """)
 #
 ###

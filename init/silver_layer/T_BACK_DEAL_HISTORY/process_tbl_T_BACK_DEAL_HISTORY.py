@@ -1,9 +1,10 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import current_timestamp, date_format, to_date, lit
+from pyspark.sql.types import TimestampType
 
 spark = (
     SparkSession.builder
-    .appName("CreateDeltaTables")
+    .appName("create_delta_tbl_T_BACK_DEAL_HISTORY")
     .enableHiveSupport()
     .getOrCreate()
 )
@@ -14,7 +15,7 @@ spark = (
 source_df = (
     spark.read
         .format("parquet")
-        .load("s3a://warehouse/bronze/V_T_LIST_FRONT_USER")
+        .load("s3a://warehouse/bronze/T_BACK_DEAL_HISTORY")
 )
 #
 ###
@@ -22,11 +23,10 @@ source_df = (
 
 ###---------------------------------ADD TECHNIQUE COLUMN---------------------------------
 #
-# source_df.withColumn("partiton_date", date_format("C_WITHDRAW_DATE", "yyyy-MM-dd"))
 silver_df = (
-    source_df.withColumn("partition_date", to_date("C_DATE_CREATE", "yyyy-MM-dd"))
+    source_df.withColumn("partition_date", to_date("C_TRANSACTION_DATE", "yyyy-MM-dd"))
                                 .withColumn("valid_from", current_timestamp())
-                                .withColumn("valid_to", lit(None))
+                                .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
                                 .withColumn("create_at", current_timestamp())
 )
@@ -46,14 +46,14 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
     silver_df.write.format("delta")
                     .mode("overwrite")
                     .partitionBy("partition_date")
-                    .option("path", "s3a://warehouse/silver/V_T_LIST_FRONT_USER")
+                    .option("path", "s3a://warehouse/silver/T_BACK_DEAL_HISTORY")
                     .save()
 )
 
 spark.sql("""
-    CREATE TABLE IF NOT EXISTS silver.dim_V_T_LIST_FRONT_USER
+    CREATE OR REPLACE TABLE silver.fact_T_BACK_DEAL_HISTORY
     USING delta
-    LOCATION 's3a://warehouse/silver/V_T_LIST_FRONT_USER'
+    LOCATION 's3a://warehouse/silver/T_BACK_DEAL_HISTORY'
 """)
 #
 ###
