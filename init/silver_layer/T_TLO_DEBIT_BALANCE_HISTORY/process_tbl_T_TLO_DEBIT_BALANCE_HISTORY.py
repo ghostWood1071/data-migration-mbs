@@ -51,6 +51,9 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
                     .save()
 )
 
+spark.sql("DROP TABLE IF EXISTS silver.fact_T_TLO_DEBIT_BALANCE_HISTORY")
+
+
 spark.sql("""
     CREATE OR REPLACE TABLE silver.fact_T_TLO_DEBIT_BALANCE_HISTORY
     USING delta
