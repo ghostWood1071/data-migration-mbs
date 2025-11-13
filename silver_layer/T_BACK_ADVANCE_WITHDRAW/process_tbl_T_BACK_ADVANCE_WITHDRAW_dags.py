@@ -34,14 +34,7 @@ with DAG(
             "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
             "spark.sql.sources.partitionOverwriteMode": "dynamic",
             "spark.eventLog.dir": "s3a://spark-logs/events",
-            "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp",
-            
-            # # 🧠 Cấu hình CPU, RAM cho driver và executor
-            # "spark.driver.cores": "1",
-            # "spark.driver.memory": "2g",
-            # "spark.executor.cores": "2",
-            # "spark.executor.memory": "4g",
-            # "spark.executor.instances": "3",  # số executor
+            "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp"
         },
         verbose=True
     )
