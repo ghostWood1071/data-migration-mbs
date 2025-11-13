@@ -24,7 +24,7 @@ with DAG(
             "spark.kubernetes.executor.hostNetwork":"true",
             "spark.kubernetes.executor.dnsPolicy":"ClusterFirstWithHostNet",
             "spark.kubernetes.namespace": "compute",
-            "spark.kubernetes.container.image": "ghostwood/mbs-spark:0.0.1-test",
+            "spark.kubernetes.container.image": "ghostwood/mbs-spark:1.0.4-streaming",
             "spark.kubernetes.authenticate.driver.serviceAccountName": "spark",
             "spark.sql.extensions": "io.delta.sql.DeltaSparkSessionExtension",
             "spark.sql.catalog.spark_catalog": "org.apache.spark.sql.delta.catalog.DeltaCatalog",
