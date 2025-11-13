@@ -152,8 +152,8 @@ def write_to_starrocks(batch_df, epoch_id):
         batch_df.drop("op")
         .write
         .format("starrocks")
-        .option("starrocks.fe.http.url", "http://kube-starrocks-fe-proxy-service.warehouse.svc.cluster.local:8030")
-        .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-proxy-service.warehouse.svc.cluster.local:9030")
+        .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
+        .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030")
         .option("starrocks.table.identifier", "mbs_realtime_db.t_back_account")
         .option("starrocks.user", "mbs_demo")
         .option("starrocks.password", "mbs_demo")
