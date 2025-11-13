@@ -55,7 +55,7 @@ spark.sql("DROP TABLE IF EXISTS silver.fact_T_TLO_DEBIT_BALANCE_HISTORY")
 
 
 spark.sql("""
-    CREATE OR REPLACE TABLE silver.fact_T_TLO_DEBIT_BALANCE_HISTORY
+    CREATE TABLE IF NOT EXISTS silver.fact_T_TLO_DEBIT_BALANCE_HISTORY
     USING delta
     LOCATION 's3a://warehouse/silver/T_TLO_DEBIT_BALANCE_HISTORY'
 """)

@@ -55,7 +55,7 @@ spark.sql("DROP TABLE IF EXISTS silver.dim_V_T_LIST_FRONT_USER")
 
 
 spark.sql("""
-    CREATE OR REPLACE TABLE silver.dim_V_T_LIST_FRONT_USER
+    CREATE TABLE IF NOT EXISTS silver.dim_V_T_LIST_FRONT_USER
     USING delta
     LOCATION 's3a://warehouse/silver/V_T_LIST_FRONT_USER'
 """)

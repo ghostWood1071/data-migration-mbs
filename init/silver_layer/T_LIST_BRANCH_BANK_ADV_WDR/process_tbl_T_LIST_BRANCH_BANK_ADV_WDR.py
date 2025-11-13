@@ -52,7 +52,7 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
 spark.sql("DROP TABLE IF EXISTS silver.dim_T_LIST_BRANCH_BANK_ADV_WDR")
 
 spark.sql("""
-    CREATE OR REPLACE TABLE silver.dim_T_LIST_BRANCH_BANK_ADV_WDR
+    CREATE TABLE IF NOT EXISTS silver.dim_T_LIST_BRANCH_BANK_ADV_WDR
     USING delta
     LOCATION 's3a://warehouse/silver/T_LIST_BRANCH_BANK_ADV_WDR'
 """)
