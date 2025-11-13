@@ -51,6 +51,9 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
                     .save()
 )
 
+spark.sql("DROP TABLE IF EXISTS silver.dim_V_T_LIST_FRONT_USER")
+
+
 spark.sql("""
     CREATE OR REPLACE TABLE silver.dim_V_T_LIST_FRONT_USER
     USING delta

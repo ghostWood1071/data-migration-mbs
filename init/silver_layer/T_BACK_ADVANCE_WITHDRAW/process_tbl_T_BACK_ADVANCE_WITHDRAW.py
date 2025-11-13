@@ -57,8 +57,10 @@ print("Tạo database thành công")
                     .save()
 )
 
+spark.sql("DROP TABLE IF EXISTS silver.fact_T_BACK_ADVANCE_WITHDRAW")
+
 spark.sql("""
-    CREATE OR REPLACE TABLE silver.fact_T_BACK_ADVANCE_WITHDRAW
+    CREATE TABLE IF NOT EXISTS silver.fact_T_BACK_ADVANCE_WITHDRAW
     USING delta
     LOCATION 's3a://warehouse/silver/T_BACK_ADVANCE_WITHDRAW'
 """)
