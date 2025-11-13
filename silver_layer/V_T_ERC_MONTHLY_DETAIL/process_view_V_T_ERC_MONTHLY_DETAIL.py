@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import current_timestamp, date_format, to_date
+from pyspark.sql.functions import current_timestamp, date_format, to_date, lit
 
 spark = (
     SparkSession.builder
@@ -23,10 +23,10 @@ source_df = (
 ###---------------------------------ADD TECHNIQUE COLUMN---------------------------------
 #
 # source_df.withColumn("partiton_date", date_format("C_WITHDRAW_DATE", "yyyy-MM-dd"))
-(
+silver_df = (
     source_df.withColumn("valid_from", current_timestamp())
-                                .withColumn("valid_to", None)
-                                .withColumn("is_current", True)
+                                .withColumn("valid_to", lit(None))
+                                .withColumn("is_current", lit(True))
                                 .withColumn("create_at", current_timestamp())
 )
 #
@@ -42,12 +42,18 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
 ###---------------------------------WRITE TABLE TO SILVER BUCKET IN MINIO---------------------------------
 #
 (
-    source_df.write.format("delta")
+    silver_df.write.format("delta")
                     .mode("overwrite")
                     .partitionBy("C_YEAR", "C_MONTH")
                     .option("path", "s3a://warehouse/silver/V_T_ERC_MONTHLY_DETAIL")
-                    .saveAsTable("silver.fact_V_T_ERC_MONTHLY_DETAIL")
+                    .save()
 )
+
+spark.sql("""
+    CREATE TABLE IF NOT EXISTS silver.fact_V_T_ERC_MONTHLY_DETAIL
+    USING delta
+    LOCATION 's3a://warehouse/silver/V_T_ERC_MONTHLY_DETAIL'
+""")
 #
 ###
 
