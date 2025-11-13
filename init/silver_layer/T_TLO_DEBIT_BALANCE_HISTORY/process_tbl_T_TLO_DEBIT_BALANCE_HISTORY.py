@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import current_timestamp, date_format, to_date, lit
+from pyspark.sql.types import TimestampType
 
 spark = (
     SparkSession.builder
@@ -14,7 +15,7 @@ spark = (
 source_df = (
     spark.read
         .format("parquet")
-        .load("s3a://warehouse/bronze/V_T_ERC_MONTHLY_DETAIL")
+        .load("s3a://warehouse/bronze/T_TLO_DEBIT_BALANCE_HISTORY")
 )
 #
 ###
@@ -24,8 +25,9 @@ source_df = (
 #
 # source_df.withColumn("partiton_date", date_format("C_WITHDRAW_DATE", "yyyy-MM-dd"))
 silver_df = (
-    source_df.withColumn("valid_from", current_timestamp())
-                                .withColumn("valid_to", lit(None))
+    source_df.withColumn("partition_date", to_date("C_TRANSACTION_DATE", "yyyy-MM-dd"))
+                                .withColumn("valid_from", current_timestamp())
+                                .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
                                 .withColumn("create_at", current_timestamp())
 )
@@ -44,15 +46,15 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
 (
     silver_df.write.format("delta")
                     .mode("overwrite")
-                    .partitionBy("C_YEAR", "C_MONTH")
-                    .option("path", "s3a://warehouse/silver/V_T_ERC_MONTHLY_DETAIL")
+                    .partitionBy("partition_date")
+                    .option("path", "s3a://warehouse/silver/T_TLO_DEBIT_BALANCE_HISTORY")
                     .save()
 )
 
 spark.sql("""
-    CREATE TABLE IF NOT EXISTS silver.fact_V_T_ERC_MONTHLY_DETAIL
+    CREATE OR REPLACE TABLE silver.fact_T_TLO_DEBIT_BALANCE_HISTORY
     USING delta
-    LOCATION 's3a://warehouse/silver/V_T_ERC_MONTHLY_DETAIL'
+    LOCATION 's3a://warehouse/silver/T_TLO_DEBIT_BALANCE_HISTORY'
 """)
 #
 ###
