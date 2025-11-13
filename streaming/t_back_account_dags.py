@@ -19,6 +19,8 @@ with DAG(
         name="cdc_source2dwh_t_back_account",
         conn_id="spark_k8s",
         conf={
+            "spark.kubernetes.driver.label.app=spark"
+            "spark.kubernetes.executor.label.app=spark"
             "spark.kubernetes.namespace": "compute",
             "spark.kubernetes.container.image": "ghostwood/mbs-spark:1.0.3-streaming",
             "spark.kubernetes.authenticate.driver.serviceAccountName": "spark",
