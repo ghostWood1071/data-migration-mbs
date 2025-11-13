@@ -22,8 +22,6 @@ with DAG(
             "spark.kubernetes.driver.hostNetwork":"true",
             "spark.kubernetes.executor.hostNetwork":"true",
             "spark.kubernetes.executor.dnsPolicy":"ClusterFirstWithHostNet",
-            "spark.kubernetes.driver.label.app":"spark",
-            "spark.kubernetes.executor.label.app":"spark",
             "spark.kubernetes.namespace": "compute",
             "spark.kubernetes.container.image": "ghostwood/mbs-spark:1.0.3-streaming",
             "spark.kubernetes.authenticate.driver.serviceAccountName": "spark",
