@@ -19,6 +19,9 @@ with DAG(
         name="cdc_source2dwh_t_back_account",
         conn_id="spark_k8s",
         conf={
+            "spark.kubernetes.driver.hostNetwork":"true",
+            "spark.kubernetes.executor.hostNetwork":"true",
+            "spark.kubernetes.executor.dnsPolicy":"ClusterFirstWithHostNet",
             "spark.kubernetes.driver.label.app":"spark",
             "spark.kubernetes.executor.label.app":"spark",
             "spark.kubernetes.namespace": "compute",
