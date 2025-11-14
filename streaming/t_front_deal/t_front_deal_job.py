@@ -143,7 +143,7 @@ for field in schema_after.fields:
         select_exprs.append(col(f"data.payload.after.{name}").alias(name))
 
 df_scd2 = df_parsed.select(*select_exprs)
-df_scd2.withColumn(
+df_scd2 = df_scd2.withColumn(
     "created_at",
     F.when(F.col("op") == F.lit("c"), F.col("updated_at")).otherwise(F.col("created_at"))   
 ).withColumn(
