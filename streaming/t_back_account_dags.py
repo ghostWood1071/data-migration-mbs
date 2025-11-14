@@ -19,10 +19,7 @@ with DAG(
         name="cdc_source2dwh_t_back_account",
         conn_id="spark_k8s",
         conf={
-            "spark.kubernetes.driver.hostNetwork":"true",
-            "spark.kubernetes.driver.dnsPolicy":"ClusterFirstWithHostNet",
-            "spark.kubernetes.executor.hostNetwork":"true",
-            "spark.kubernetes.executor.dnsPolicy":"ClusterFirstWithHostNet",
+            "spark.databricks.delta.schema.autoMerge.enabled": "true",
             "spark.kubernetes.namespace": "compute",
             "spark.kubernetes.container.image": "ghostwood/mbs-spark:1.0.4-streaming",
             "spark.kubernetes.authenticate.driver.serviceAccountName": "spark",
