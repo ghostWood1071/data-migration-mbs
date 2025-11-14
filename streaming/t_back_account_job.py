@@ -2,9 +2,6 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json, when, lit
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, TimestampType
 
-# ==============================================================
-# 1️⃣ Khởi tạo Spark
-# ==============================================================
 spark = (
     SparkSession.builder
     .appName("CDC_Account_To_StarRocks")
@@ -12,9 +9,6 @@ spark = (
     .getOrCreate()
 )
 
-# ==============================================================
-# 2️⃣ Khai báo schema thủ công (đã có sẵn từ bạn)
-# ==============================================================
 schema_after = StructType([
     StructField("PK_ACCOUNT", StringType(), False),
     StructField("C_ACCOUNT_BRANCH_CODE", StringType(), True),
@@ -22,9 +16,9 @@ schema_after = StructType([
     StructField("C_CREATOR_CODE", StringType(), True),
     StructField("C_CREATOR_BRANCH_CODE", StringType(), True),
     StructField("C_CREATOR_SUB_BRANCH_CODE", StringType(), True),
-    StructField("C_CREATE_TIME", StringType(), True),
+    StructField("C_CREATE_TIME", TimestampType(), True),
     StructField("C_APPROVER_CODE", StringType(), True),
-    StructField("C_APPROVE_TIME", StringType(), True),
+    StructField("C_APPROVE_TIME", TimestampType(), True),
     StructField("C_CUSTOMER_CODE", StringType(), True),
     StructField("C_ACCOUNT_CODE", StringType(), True),
     StructField("C_ACCOUNT_TYPE", StringType(), True),
@@ -40,7 +34,7 @@ schema_after = StructType([
     StructField("C_COMM_PACKAGE", StringType(), True),
     StructField("C_ACCOUNT_STATUS", StringType(), True),
     StructField("C_CLOSER_CODE", StringType(), True),
-    StructField("C_CLOSE_TIME", StringType(), True),
+    StructField("C_CLOSE_TIME", TimestampType(), True),
     StructField("C_NEW_CUST_EXPIRE_DATE", StringType(), True),
     StructField("C_COLLABORATOR", StringType(), True),
     StructField("C_MODIFY_USER_CODE", StringType(), True),
@@ -68,9 +62,9 @@ schema_after = StructType([
     StructField("C_ATS_BANK_ACCOUNT", StringType(), True),
     StructField("C_ATS_BANK", StringType(), True),
     StructField("C_BANK_RESPONSE_MAPPING", StringType(), True),
-    StructField("C_RESPONSE_MAPPING_TIME", StringType(), True),
+    StructField("C_RESPONSE_MAPPING_TIME", TimestampType(), True),
     StructField("C_BANK_RESPONSE_UNMAPPING", StringType(), True),
-    StructField("C_RESPONSE_UNMAPPING_TIME", StringType(), True),
+    StructField("C_RESPONSE_UNMAPPING_TIME", TimestampType(), True),
     StructField("C_VSD_STATUS", StringType(), True),
     StructField("C_VSD_RESPONSE", StringType(), True),
     StructField("C_VSD_OPEN_FLAG", DoubleType(), True),
@@ -105,9 +99,9 @@ schema_after = StructType([
     StructField("C_ATS_BANK_BRANCH_CD", StringType(), True),
     StructField("C_IS_ONBOARD", DoubleType(), True),
     StructField("C_COPI24_TYPE", StringType(), True),
-    StructField("C_VSD_OPEN_SEND_TIME", StringType(), True),
+    StructField("C_VSD_OPEN_SEND_TIME", TimestampType(), True),
     StructField("C_FOR_TRADING_BOND", DoubleType(), True),
-    StructField("C_VSD_FIRST_OPEN_SEND_TIME", StringType(), True),
+    StructField("C_VSD_FIRST_OPEN_SEND_TIME", TimestampType(), True),
     StructField("C_CARE_PACKAGE", StringType(), True)
 ])
 
@@ -116,9 +110,6 @@ schema_cdc = StructType() \
     .add("after", schema_after) \
     .add("op", StringType())
 
-# ==============================================================
-# 3️⃣ Đọc từ Kafka
-# ==============================================================
 df_kafka = (
     spark.readStream
     .format("kafka")
@@ -130,23 +121,13 @@ df_kafka = (
 
 df_json = df_kafka.selectExpr("CAST(value AS STRING) as json_str")
 
-# parse trực tiếp bằng schema đã có
 df_parsed = df_json.select(from_json(col("json_str"), schema_cdc).alias("data"))
 
-# ==============================================================
-# 4️⃣ Lấy dữ liệu "after" và cột op
-# ==============================================================
 df_flat = df_parsed.select(
     col("data.after.*"),
     col("data.op").alias("op")
 )
 
-# thêm cột _delete để connector hiểu xoá
-df_ready = df_flat.withColumn("_delete", when(col("op") == "d", lit(True)).otherwise(lit(False)))
-
-# ==============================================================
-# 5️⃣ Ghi vào StarRocks
-# ==============================================================
 def write_to_starrocks(batch_df, epoch_id):
     (
         batch_df.drop("op")
