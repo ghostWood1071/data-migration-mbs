@@ -26,7 +26,7 @@ print("Đọc thành công")
 ###---------------------------------ADD TECHNIQUE COLUMN---------------------------------
 #
 silver_df  = (
-    source_df.withColumn("partition_date", to_date("C_WITHDRAW_DATE", "yyyy-MM-dd"))
+    source_df.withColumn("partition_date", to_date("C_APPROVE_TIME", "yyyy-MM-dd"))
                                 .withColumn("valid_from", current_timestamp())
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))

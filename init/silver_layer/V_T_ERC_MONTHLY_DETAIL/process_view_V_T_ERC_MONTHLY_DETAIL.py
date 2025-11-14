@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import current_timestamp, date_format, to_date, lit
-from pyspark.sql.types import TimestampType
+from pyspark.sql.functions import current_timestamp, date_format, to_date, lit, col
+from pyspark.sql.types import TimestampType, StringType
 
 spark = (
     SparkSession.builder
@@ -26,6 +26,8 @@ source_df = (
 # source_df.withColumn("partiton_date", date_format("C_WITHDRAW_DATE", "yyyy-MM-dd"))
 silver_df = (
     source_df.withColumn("valid_from", current_timestamp())
+            .withColumn("partition_year", col("C_YEAR").cast(StringType()))
+            .withColumn("partition_month", col("C_MONTH").cast(StringType()))
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
                                 .withColumn("create_at", current_timestamp())
@@ -45,7 +47,7 @@ spark.sql("CREATE DATABASE IF NOT EXISTS gold")
 (
     silver_df.write.format("delta")
                     .mode("overwrite")
-                    .partitionBy("C_YEAR", "C_MONTH")
+                    .partitionBy("partition_year", "partition_month")
                     .option("path", "s3a://warehouse/silver/V_T_ERC_MONTHLY_DETAIL")
                     .save()
 )

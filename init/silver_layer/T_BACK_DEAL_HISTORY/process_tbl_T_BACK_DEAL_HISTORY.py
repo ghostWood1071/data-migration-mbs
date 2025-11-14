@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import current_timestamp, date_format, to_date, lit
-from pyspark.sql.types import TimestampType
+from pyspark.sql.functions import current_timestamp, date_format, to_date, lit, col
+from pyspark.sql.types import TimestampType, DecimalType
 
 spark = (
     SparkSession.builder
@@ -29,6 +29,15 @@ silver_df = (
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
                                 .withColumn("create_at", current_timestamp())
+                                .withColumn("C_ORDER_NO", col("C_ORDER_NO").cast(DecimalType(38, 10)))
+                                .withColumn("C_SUB_ORDER_NO", col("C_SUB_ORDER_NO").cast(DecimalType(38, 10)))
+                                .withColumn("C_MATCHED_VOLUME", col("C_MATCHED_VOLUME").cast(DecimalType(38, 10)))
+                                .withColumn("C_MATCHED_PRICE", col("C_MATCHED_PRICE").cast(DecimalType(38, 10)))
+                                .withColumn("C_COMM_RATE", col("C_COMM_RATE").cast(DecimalType(38, 10)))
+                                .withColumn("C_TAX_FLAG", col("C_TAX_FLAG").cast(DecimalType(38, 10)))
+                                .withColumn("C_TAX_RATE", col("C_TAX_RATE").cast(DecimalType(38, 10)))
+                                .withColumn("C_DEAL_STATUS", col("C_DEAL_STATUS").cast(DecimalType(38, 10)))
+                                .withColumn("C_CARE_RATE", col("C_CARE_RATE").cast(DecimalType(38, 10)))          
 )
 #
 
