@@ -1,5 +1,6 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import current_timestamp
+from pyspark.sql.functions import current_timestamp, date_format, to_date, lit
+from pyspark.sql.types import TimestampType
 
 spark = (
     SparkSession.builder
@@ -20,7 +21,7 @@ DATABASE_CONFIG = {
 
 ###---------------------------------READ DATA FROM ORACLE DB---------------------------------
 #
-T_TLO_DEBIT_BALANCE_HISTORY_df = (
+incremental_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG["url"])
@@ -33,9 +34,22 @@ T_TLO_DEBIT_BALANCE_HISTORY_df = (
 #
 ###
 
-###---------------------------------WRITE DATA TO BRONZE BUCKET IN MINIO---------------------------------
+###---------------------------------INCREMENTAL LOAD DATA TO BRONZE LAYER---------------------------------
 #
-T_TLO_DEBIT_BALANCE_HISTORY_df.write.format("parquet").mode("append").save("s3a://warehouse/bronze/T_TLO_DEBIT_BALANCE_HISTORY")
+incremental_df.write.format("parquet").mode("append").save("s3a://warehouse/bronze/T_TLO_DEBIT_BALANCE_HISTORY")
+#
+###
+
+###---------------------------------INCREMENTAL LOAD DATA TO SILVER LAYER---------------------------------
+#
+silver_df  = (
+    incremental_df.withColumn("partition_date", to_date("C_TRANSACTION_DATE", "yyyy-MM-dd"))
+                                .withColumn("valid_from", current_timestamp())
+                                .withColumn("valid_to", lit(None).cast(TimestampType()))
+                                .withColumn("is_current", lit(True))
+                                .withColumn("create_at", current_timestamp())
+)
+silver_df.write.format("parquet").mode("append").save("s3a://warehouse/silver/T_TLO_DEBIT_BALANCE_HISTORY")
 #
 ###
 

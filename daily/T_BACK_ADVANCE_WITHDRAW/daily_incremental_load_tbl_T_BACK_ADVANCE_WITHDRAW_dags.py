@@ -5,18 +5,18 @@ from datetime import datetime
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
-    dag_id="spark_process_bronze_layer_tbl_T_BACK_ADVANCE_WITHDRAW",
+    dag_id="spark_daily_incremental_load_tbl_T_BACK_ADVANCE_WITHDRAW",
     start_date=datetime(2025, 10, 19),
     schedule_interval=None,
     catchup=False,
-    tags=["spark", "delta", "hive"]
+    tags=["spark", "delta", "hive", "daily"]
 ) as dag:
 
-    process_bronze_layer = SparkSubmitOperator(
-        task_id="process_bronze_layer_tbl_T_BACK_ADVANCE_WITHDRAW",
-        application="s3a://asset/spark-jobs/load_tbl_T_BACK_ADVANCE_WITHDRAW.py",
+    daily_incremental_load = SparkSubmitOperator(
+        task_id="daily_incremental_load_tbl_T_BACK_ADVANCE_WITHDRAW",
+        application="s3a://asset/spark-jobs/daily_incremental_load_tbl_T_BACK_ADVANCE_WITHDRAW.py",
         deploy_mode="cluster",
-        name="spark-process-bronze_tbl_T_BACK_ADVANCE_WITHDRAW",
+        name="spark-daily-incremental-load-tbl_T_BACK_ADVANCE_WITHDRAW",
         conn_id="spark_k8s",
         conf={
             "spark.kubernetes.namespace": "compute",
@@ -39,4 +39,4 @@ with DAG(
         verbose=True
     )
 
-    process_bronze_layer
+    daily_incremental_load
