@@ -4,6 +4,7 @@ from pyspark.sql.types import (
     StructType, StructField,
     StringType, DoubleType, TimestampType, LongType
 )
+import pyspark.sql.functions as F
 
 # =========================
 # 1. SparkSession Config
@@ -128,11 +129,15 @@ schema_after = StructType([
     StructField("C_CARE_PACKAGE", StringType(), True)
 ])
 
-schema_cdc = StructType() \
+schema_payload = StructType() \
     .add("before", schema_after) \
     .add("after", schema_after) \
     .add("op", StringType()) \
     .add("ts_ms", LongType())
+
+# schema root của message: { "schema": {...}, "payload": {...} }
+schema_root = StructType() \
+    .add("payload", schema_payload)
 
 # =========================
 # 3. Read Debezium CDC from Kafka
@@ -150,7 +155,7 @@ df_kafka = (
 df_json = df_kafka.selectExpr("CAST(value AS STRING) AS json_str")
 
 df_parsed = df_json.select(
-    from_json(col("json_str"), schema_cdc).alias("data")
+    from_json(col("json_str"), schema_root).alias("data")
 )
 
 # =========================
@@ -163,40 +168,52 @@ select_exprs = []
 
 # PK_ACCOUNT: ưu tiên after, nếu delete thì lấy before
 select_exprs.append(
-    coalesce(col("data.after.PK_ACCOUNT"), col("data.before.PK_ACCOUNT")).alias("PK_ACCOUNT")
+    coalesce(
+        col("data.payload.after.PK_ACCOUNT"),
+        col("data.payload.before.PK_ACCOUNT")
+    ).alias("PK_ACCOUNT")
 )
 
 # created_at: từ C_CREATE_TIME (ngày tạo account trong hệ thống gốc)
 select_exprs.append(
     coalesce(
-        col("data.after.C_CREATE_TIME"),
-        col("data.before.C_CREATE_TIME")
+        col("data.payload.after.C_CREATE_TIME"),
+        col("data.payload.before.C_CREATE_TIME")
     ).alias("created_at")
 )
 
 # updated_at: thời điểm event Debezium (ts_ms → timestamp)
 select_exprs.append(
-    (col("data.ts_ms") / 1000).cast(TimestampType()).alias("updated_at")
+    (col("data.payload.ts_ms") / 1000).cast(TimestampType()).alias("updated_at")
 )
 
 # op: Debezium operation 'c', 'u', 'd'
 select_exprs.append(
-    col("data.op").alias("op")
+    col("data.payload.op").alias("op")
 )
 
 # Các cột business: lấy từ after.* (delete thì null, vẫn ok cho SCD2)
 for field in schema_after.fields:
     name = field.name
-    # tránh duplicate PK_ACCOUNT (đã tạo ở trên)
-    if name == "PK_ACCOUNT":
-        continue
-    select_exprs.append(col(f"data.after.{name}").alias(name))
+    if name not in ["PK_ACCOUNT", "C_CREATE_TIME"]:
+    # PK_ACCOUNT & C_CREATE_TIME đã map rồi, nhưng giữ C_CREATE_TIME business vẫn tốt
+        select_exprs.append(col(f"data.payload.after.{name}").alias(name))
 
 df_scd2 = df_parsed.select(*select_exprs)
-
+df_scd2.withColumn(
+    "created_at",
+    F.when(F.col("op") == F.lit("c"), F.col("updated_at")).otherwise(F.col("created_at"))   
+).withColumn(
+    "partition_date",
+    F.date_format(F.col("updated_at"), "yyyy-MM-dd")
+)
 print("SCD2 columns:", len(df_scd2.columns))
 print(df_scd2.columns)
 
+
+# =========================
+# 6. Write streaming ra Delta (append-only SCD2)
+# =========================
 
 (
     df_scd2.writeStream

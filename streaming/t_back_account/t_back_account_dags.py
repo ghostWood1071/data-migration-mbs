@@ -5,7 +5,7 @@ from datetime import datetime
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
-    dag_id="cdc_source2dwh_t_back_account",
+    dag_id="cdc_source2silver_t_back_account",
     start_date=datetime(2025, 10, 19),
     schedule_interval=None,
     catchup=False,
@@ -13,10 +13,10 @@ with DAG(
 ) as dag:
 
     create_delta_job = SparkSubmitOperator(
-        task_id="cdc_source2dwh_t_back_account",
+        task_id="cdc_source2silver_t_back_account",
         application="s3a://asset/spark-jobs/t_back_account_job.py",
         deploy_mode="cluster",
-        name="cdc_source2dwh_t_back_account",
+        name="cdc_source2silver_t_back_account",
         conn_id="spark_k8s",
         conf={
             "spark.databricks.delta.schema.autoMerge.enabled": "true",

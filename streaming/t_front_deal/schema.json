@@ -1,0 +1,646 @@
+
+{
+    "schema": {
+        "type": "struct",
+        "fields": [
+            {
+                "type": "struct",
+                "fields": [
+                    {
+                        "type": "double",
+                        "optional": false,
+                        "field": "PK_FRONT_DEAL"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_MARKET"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_TRADING_CENTER"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_ORDER_NO"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_SUB_ORDER_NO"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_TRADER_BRANCH_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_TRADER_SUB_BRANCH_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_TRADER_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_BROKER_BRANCH_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_BROKER_SUB_BRANCH_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_BROKER_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_ACCOUNT_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_ACCOUNT_TYPE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SHARE_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SHARE_TYPE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SHARE_STATUS"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SIDE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SIDE_TYPE"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_SHORT_SALE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_CHANEL"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_DUEDAY"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "default": 0.0,
+                        "field": "C_MATCHED_VOLUME"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_MATCHED_PRICE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "name": "io.debezium.time.IsoTimestamp",
+                        "version": 1,
+                        "field": "C_MATCHED_TIME"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_CONFIRM_NO"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SET_ORDER_TYPE"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_MAX_FEE_RATE"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_DEAL_STATUS"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_ISIN_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_MARKET_ID"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_MARKET_SUBID"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_KRX_ORDER_ID"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_KRX_EXEC_ID"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_KRX_CLORDID"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_KRX_ORIG_CLORDID"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "default": 0.0,
+                        "field": "C_TAX_RATE"
+                    }
+                ],
+                "optional": true,
+                "name": "oracle-bo-poc.FRONT.T_FRONT_DEAL.Value",
+                "field": "before"
+            },
+            {
+                "type": "struct",
+                "fields": [
+                    {
+                        "type": "double",
+                        "optional": false,
+                        "field": "PK_FRONT_DEAL"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_MARKET"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_TRADING_CENTER"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_ORDER_NO"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_SUB_ORDER_NO"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_TRADER_BRANCH_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_TRADER_SUB_BRANCH_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_TRADER_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_BROKER_BRANCH_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_BROKER_SUB_BRANCH_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_BROKER_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_ACCOUNT_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_ACCOUNT_TYPE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SHARE_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SHARE_TYPE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SHARE_STATUS"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SIDE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SIDE_TYPE"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_SHORT_SALE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_CHANEL"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_DUEDAY"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "default": 0.0,
+                        "field": "C_MATCHED_VOLUME"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_MATCHED_PRICE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "name": "io.debezium.time.IsoTimestamp",
+                        "version": 1,
+                        "field": "C_MATCHED_TIME"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_CONFIRM_NO"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_SET_ORDER_TYPE"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_MAX_FEE_RATE"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "field": "C_DEAL_STATUS"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_ISIN_CODE"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_MARKET_ID"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_MARKET_SUBID"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_KRX_ORDER_ID"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_KRX_EXEC_ID"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_KRX_CLORDID"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "C_KRX_ORIG_CLORDID"
+                    },
+                    {
+                        "type": "double",
+                        "optional": true,
+                        "default": 0.0,
+                        "field": "C_TAX_RATE"
+                    }
+                ],
+                "optional": true,
+                "name": "oracle-bo-poc.FRONT.T_FRONT_DEAL.Value",
+                "field": "after"
+            },
+            {
+                "type": "struct",
+                "fields": [
+                    {
+                        "type": "string",
+                        "optional": false,
+                        "field": "version"
+                    },
+                    {
+                        "type": "string",
+                        "optional": false,
+                        "field": "connector"
+                    },
+                    {
+                        "type": "string",
+                        "optional": false,
+                        "field": "name"
+                    },
+                    {
+                        "type": "int64",
+                        "optional": false,
+                        "field": "ts_ms"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "name": "io.debezium.data.Enum",
+                        "version": 1,
+                        "parameters": {
+                            "allowed": "true,first,first_in_data_collection,last_in_data_collection,last,false,incremental"
+                        },
+                        "default": "false",
+                        "field": "snapshot"
+                    },
+                    {
+                        "type": "string",
+                        "optional": false,
+                        "field": "db"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "sequence"
+                    },
+                    {
+                        "type": "int64",
+                        "optional": true,
+                        "field": "ts_us"
+                    },
+                    {
+                        "type": "int64",
+                        "optional": true,
+                        "field": "ts_ns"
+                    },
+                    {
+                        "type": "string",
+                        "optional": false,
+                        "field": "schema"
+                    },
+                    {
+                        "type": "string",
+                        "optional": false,
+                        "field": "table"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "txId"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "scn"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "commit_scn"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "lcr_position"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "rs_id"
+                    },
+                    {
+                        "type": "int64",
+                        "optional": true,
+                        "field": "ssn"
+                    },
+                    {
+                        "type": "int32",
+                        "optional": true,
+                        "field": "redo_thread"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "user_name"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "redo_sql"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "row_id"
+                    },
+                    {
+                        "type": "int64",
+                        "optional": true,
+                        "field": "commit_ts_ms"
+                    },
+                    {
+                        "type": "string",
+                        "optional": true,
+                        "field": "start_scn"
+                    },
+                    {
+                        "type": "int64",
+                        "optional": true,
+                        "field": "start_ts_ms"
+                    }
+                ],
+                "optional": false,
+                "name": "io.debezium.connector.oracle.Source",
+                "version": 1,
+                "field": "source"
+            },
+            {
+                "type": "struct",
+                "fields": [
+                    {
+                        "type": "string",
+                        "optional": false,
+                        "field": "id"
+                    },
+                    {
+                        "type": "int64",
+                        "optional": false,
+                        "field": "total_order"
+                    },
+                    {
+                        "type": "int64",
+                        "optional": false,
+                        "field": "data_collection_order"
+                    }
+                ],
+                "optional": true,
+                "name": "event.block",
+                "version": 1,
+                "field": "transaction"
+            },
+            {
+                "type": "string",
+                "optional": false,
+                "field": "op"
+            },
+            {
+                "type": "int64",
+                "optional": true,
+                "field": "ts_ms"
+            },
+            {
+                "type": "int64",
+                "optional": true,
+                "field": "ts_us"
+            },
+            {
+                "type": "int64",
+                "optional": true,
+                "field": "ts_ns"
+            }
+        ],
+        "optional": false,
+        "name": "oracle-bo-poc.FRONT.T_FRONT_DEAL.Envelope",
+        "version": 2
+    },
+    "payload": {
+        "before": null,
+        "after": {
+            "PK_FRONT_DEAL": 4792647.0,
+            "C_MARKET": "1",
+            "C_TRADING_CENTER": "2",
+            "C_ORDER_NO": 8.0,
+            "C_SUB_ORDER_NO": 1.0,
+            "C_TRADER_BRANCH_CODE": null,
+            "C_TRADER_SUB_BRANCH_CODE": null,
+            "C_TRADER_CODE": "1599",
+            "C_BROKER_BRANCH_CODE": "22",
+            "C_BROKER_SUB_BRANCH_CODE": "54",
+            "C_BROKER_CODE": "3299",
+            "C_ACCOUNT_CODE": "9091331",
+            "C_ACCOUNT_TYPE": "005F",
+            "C_SHARE_CODE": "ACB",
+            "C_SHARE_TYPE": "S",
+            "C_SHARE_STATUS": "02",
+            "C_SIDE": "S",
+            "C_SIDE_TYPE": "B",
+            "C_SHORT_SALE": null,
+            "C_CHANEL": "D",
+            "C_DUEDAY": 2.0,
+            "C_MATCHED_VOLUME": 20.0,
+            "C_MATCHED_PRICE": 40000.0,
+            "C_MATCHED_TIME": null,
+            "C_CONFIRM_NO": "00511102025S0499",
+            "C_SET_ORDER_TYPE": "P2",
+            "C_MAX_FEE_RATE": 0.6,
+            "C_DEAL_STATUS": null,
+            "C_ISIN_CODE": "VN000000ACB8",
+            "C_MARKET_ID": "STO",
+            "C_MARKET_SUBID": "T4",
+            "C_KRX_ORDER_ID": "00511102025S0499",
+            "C_KRX_EXEC_ID": null,
+            "C_KRX_CLORDID": "00511102025S0499",
+            "C_KRX_ORIG_CLORDID": "00511102025S0499",
+            "C_TAX_RATE": 0.1
+        },
+        "source": {
+            "version": "3.1.0.Final",
+            "connector": "oracle",
+            "name": "oracle-bo-poc",
+            "ts_ms": 1762746851000,
+            "snapshot": "false",
+            "db": "KRXTRADING",
+            "sequence": null,
+            "ts_us": 1762746851000000,
+            "ts_ns": 1762746851000000000,
+            "schema": "FRONT",
+            "table": "T_FRONT_DEAL",
+            "txId": "000a0003000de232",
+            "scn": "6003926694849",
+            "commit_scn": "6003926694851",
+            "lcr_position": null,
+            "rs_id": "0x001088.000ce7b9.0158",
+            "ssn": 0,
+            "redo_thread": 1,
+            "user_name": "FRONT",
+            "redo_sql": null,
+            "row_id": "AAAuqWAA/AAACnNAAA",
+            "commit_ts_ms": 1762746851000,
+            "start_scn": "6003926694849",
+            "start_ts_ms": 1762746851000
+        },
+        "transaction": null,
+        "op": "c",
+        "ts_ms": 1762746854835,
+        "ts_us": 1762746854835008,
+        "ts_ns": 1762746854835008009
+    }
+}
