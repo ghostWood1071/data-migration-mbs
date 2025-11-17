@@ -42,7 +42,6 @@ silver_df  = (
                                 .withColumn("valid_from", current_timestamp())
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
-                                .withColumn("create_at", current_timestamp())
 )
 #
 
@@ -74,8 +73,6 @@ spark.sql("""
 
 #
 ###
-
-print("Tạo bảng thành công")
 
 
 spark.stop()

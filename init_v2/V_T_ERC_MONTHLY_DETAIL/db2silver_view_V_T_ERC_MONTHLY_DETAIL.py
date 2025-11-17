@@ -44,7 +44,6 @@ silver_df = (
             .withColumn("partition_month", col("C_MONTH").cast(StringType()))
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
-                                .withColumn("create_at", current_timestamp())
 )
 #
 
