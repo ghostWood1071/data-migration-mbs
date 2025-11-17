@@ -37,7 +37,7 @@ with DAG(
             "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp",
             "spark.executor.instances": "2",
             "spark.executor.cores": "4",
-            "spark.executor.memory": "4g"
+            "spark.executor.memory": "2g"
         },
         verbose=True
     )
