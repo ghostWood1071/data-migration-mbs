@@ -4,9 +4,7 @@ from pyspark.sql.types import TimestampType, DecimalType
 
 spark = (
     SparkSession.builder
-    .appName("CreateDeltaTables")
-    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
-    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
+    .appName("create_delta_tbl_T_BACK_DEAL_HISTORY")
     .enableHiveSupport()
     .getOrCreate()
 )
@@ -19,13 +17,14 @@ DATABASE_CONFIG = {
     "driver": "oracle.jdbc.driver.OracleDriver"
 }
 
+
 ###---------------------------------READ DATA FROM ORACLE DB---------------------------------
 #
-incremental_df = (
+T_BACK_DEAL_HISTORY_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG["url"])
-        .option("dbtable", "(SELECT * FROM BACK.T_BACK_DEAL_HISTORY WHERE C_TRANSACTION_DATE >= TRUNC(SYSDATE) AND C_TRANSACTION_DATE < TRUNC(SYSDATE) + 1) tbl")
+        .option("dbtable", "BACK.T_BACK_DEAL_HISTORY")
         .option("user", DATABASE_CONFIG["user"])
         .option("password", DATABASE_CONFIG["password"])
         .option("driver", DATABASE_CONFIG["driver"])
@@ -34,16 +33,11 @@ incremental_df = (
 #
 ###
 
-###---------------------------------INCREMENTAL LOAD DATA TO BRONZE LAYER---------------------------------
-#
-incremental_df.write.format("parquet").mode("append").save("s3a://warehouse/bronze/T_BACK_DEAL_HISTORY")
-#
-###
 
-###---------------------------------INCREMENTAL LOAD DATA TO SILVER LAYER---------------------------------
+###---------------------------------ADD TECHNIQUE COLUMN---------------------------------
 #
-silver_df  = (
-        incremental_df.withColumn("partition_date", to_date("C_TRANSACTION_DATE", "yyyy-MM-dd"))
+silver_df = (
+    T_BACK_DEAL_HISTORY_df.withColumn("partition_date", to_date("C_TRANSACTION_DATE", "yyyy-MM-dd"))
                                 .withColumn("valid_from", current_timestamp())
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
@@ -56,16 +50,34 @@ silver_df  = (
                                 .withColumn("C_TAX_FLAG", col("C_TAX_FLAG").cast(DecimalType(38, 10)))
                                 .withColumn("C_TAX_RATE", col("C_TAX_RATE").cast(DecimalType(38, 10)))
                                 .withColumn("C_DEAL_STATUS", col("C_DEAL_STATUS").cast(DecimalType(38, 10)))
-                                .withColumn("C_CARE_RATE", col("C_CARE_RATE").cast(DecimalType(38, 10)))  
+                                .withColumn("C_CARE_RATE", col("C_CARE_RATE").cast(DecimalType(38, 10)))          
 )
+#
 
 
+###---------------------------------CREATE DATABASES---------------------------------
+#
+spark.sql("CREATE DATABASE IF NOT EXISTS silver")
+#
+
+
+###---------------------------------WRITE TABLE TO SILVER BUCKET IN MINIO---------------------------------
+#
 (
     silver_df.write.format("delta")
-                .mode("append").partitionBy("partition_date")
-                .option("path", "s3a://warehouse/silver/T_BACK_DEAL_HISTORY")
-                .save()
+                    .mode("overwrite")
+                    .partitionBy("partition_date")
+                    .option("path", "s3a://warehouse/silver/T_BACK_DEAL_HISTORY")
+                    .save()
 )
+
+spark.sql("DROP TABLE IF EXISTS silver.fact_T_BACK_DEAL_HISTORY")
+
+spark.sql("""
+    CREATE TABLE IF NOT EXISTS silver.fact_T_BACK_DEAL_HISTORY
+    USING delta
+    LOCATION 's3a://warehouse/silver/T_BACK_DEAL_HISTORY'
+""")
 #
 ###
 
