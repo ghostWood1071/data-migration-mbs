@@ -49,7 +49,13 @@ silver_df  = (
                                 .withColumn("is_current", lit(True))
                                 .withColumn("create_at", current_timestamp())
 )
-silver_df.write.format("parquet").mode("append").save("s3a://warehouse/silver/T_MARGIN_EXTRA_BALANCE_HIS")
+
+(
+    silver_df.write.format("delta")
+                .mode("append").partitionBy("partition_date")
+                .option("path", "s3a://warehouse/silver/T_MARGIN_EXTRA_BALANCE_HIS")
+                .save()
+)
 #
 ###
 

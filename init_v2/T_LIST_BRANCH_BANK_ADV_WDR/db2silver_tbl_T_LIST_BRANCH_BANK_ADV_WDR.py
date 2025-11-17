@@ -5,8 +5,6 @@ from pyspark.sql.types import TimestampType
 spark = (
     SparkSession.builder
     .appName("CreateDeltaTables")
-    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
-    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
     .enableHiveSupport()
     .getOrCreate()
 )
@@ -19,13 +17,14 @@ DATABASE_CONFIG = {
     "driver": "oracle.jdbc.driver.OracleDriver"
 }
 
+
 ###---------------------------------READ DATA FROM ORACLE DB---------------------------------
 #
-incremental_df = (
+T_LIST_BRANCH_BANK_ADV_WDR_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG["url"])
-        .option("dbtable", "(SELECT * FROM BACK.T_TLO_DEBIT_BALANCE_HISTORY WHERE C_TRANSACTION_DATE >= TRUNC(SYSDATE) AND C_TRANSACTION_DATE < TRUNC(SYSDATE) + 1) tbl")
+        .option("dbtable", "BACK.T_LIST_BRANCH_BANK_ADV_WDR")
         .option("user", DATABASE_CONFIG["user"])
         .option("password", DATABASE_CONFIG["password"])
         .option("driver", DATABASE_CONFIG["driver"])
@@ -34,27 +33,41 @@ incremental_df = (
 #
 ###
 
-###---------------------------------INCREMENTAL LOAD DATA TO BRONZE LAYER---------------------------------
-#
-incremental_df.write.format("parquet").mode("append").save("s3a://warehouse/bronze/T_TLO_DEBIT_BALANCE_HISTORY")
-#
-###
 
-###---------------------------------INCREMENTAL LOAD DATA TO SILVER LAYER---------------------------------
+###---------------------------------ADD TECHNIQUE COLUMN---------------------------------
 #
-silver_df  = (
-    incremental_df.withColumn("partition_date", to_date("C_TRANSACTION_DATE", "yyyy-MM-dd"))
-                                .withColumn("valid_from", current_timestamp())
+# source_df.withColumn("partiton_date", date_format("C_WITHDRAW_DATE", "yyyy-MM-dd"))
+silver_df = (
+    T_LIST_BRANCH_BANK_ADV_WDR_df.withColumn("valid_from", current_timestamp())
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
                                 .withColumn("create_at", current_timestamp())
 )
+#
+
+
+###---------------------------------CREATE DATABASES---------------------------------
+#
+spark.sql("CREATE DATABASE IF NOT EXISTS silver")
+#
+
+
+###---------------------------------WRITE TABLE TO SILVER BUCKET IN MINIO---------------------------------
+#
 (
     silver_df.write.format("delta")
-                .mode("append").partitionBy("partition_date")
-                .option("path", "s3a://warehouse/silver/T_TLO_DEBIT_BALANCE_HISTORY")
-                .save()
+                    .mode("overwrite")
+                    .option("path", "s3a://warehouse/silver/T_LIST_BRANCH_BANK_ADV_WDR")
+                    .save()
 )
+
+spark.sql("DROP TABLE IF EXISTS silver.dim_T_LIST_BRANCH_BANK_ADV_WDR")
+
+spark.sql("""
+    CREATE TABLE IF NOT EXISTS silver.dim_T_LIST_BRANCH_BANK_ADV_WDR
+    USING delta
+    LOCATION 's3a://warehouse/silver/T_LIST_BRANCH_BANK_ADV_WDR'
+""")
 #
 ###
 
