@@ -14,7 +14,7 @@ with DAG(
 
     load_from_db_to_silver = SparkSubmitOperator(
         task_id="db2silver_tbl_T_LIST_BRANCH_BANK_ADV_WDR",
-        application="s3a://asset/spark-jobs/db2silver_T_LIST_BRANCH_BANK_ADV_WDR.py",
+        application="s3a://asset/spark-jobs/db2silver_tbl_T_LIST_BRANCH_BANK_ADV_WDR.py", 
         deploy_mode="cluster",
         name="spark-db2silver_tbl_T_LIST_BRANCH_BANK_ADV_WDR",
         conn_id="spark_k8s",
