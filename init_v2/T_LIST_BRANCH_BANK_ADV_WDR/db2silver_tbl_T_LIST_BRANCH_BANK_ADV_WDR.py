@@ -41,7 +41,6 @@ silver_df = (
     T_LIST_BRANCH_BANK_ADV_WDR_df.withColumn("valid_from", current_timestamp())
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
-                                .withColumn("create_at", current_timestamp())
 )
 #
 

@@ -5,7 +5,7 @@ from datetime import datetime
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
-    dag_id="spark_db2silver_layer_tbl_T_TLO_DEBIT_BALANCE_HISTORY",
+    dag_id="spark_db2silver_tbl_T_TLO_DEBIT_BALANCE_HISTORY",
     start_date=datetime(2025, 10, 19),
     schedule_interval=None,
     catchup=False,

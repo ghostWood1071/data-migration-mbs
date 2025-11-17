@@ -41,7 +41,6 @@ silver_df = (
                                 .withColumn("valid_from", current_timestamp())
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
-                                .withColumn("create_at", current_timestamp())
                                 .withColumn("C_ORDER_NO", col("C_ORDER_NO").cast(DecimalType(38, 10)))
                                 .withColumn("C_SUB_ORDER_NO", col("C_SUB_ORDER_NO").cast(DecimalType(38, 10)))
                                 .withColumn("C_MATCHED_VOLUME", col("C_MATCHED_VOLUME").cast(DecimalType(38, 10)))

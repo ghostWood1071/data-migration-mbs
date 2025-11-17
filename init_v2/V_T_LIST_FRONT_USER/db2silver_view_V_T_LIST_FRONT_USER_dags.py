@@ -5,7 +5,7 @@ from datetime import datetime
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
-    dag_id="spark_db2silver_layer_view_V_T_LIST_FRONT_USER",
+    dag_id="spark_db2silver_view_V_T_LIST_FRONT_USER",
     start_date=datetime(2025, 10, 19),
     schedule_interval=None,
     catchup=False,
