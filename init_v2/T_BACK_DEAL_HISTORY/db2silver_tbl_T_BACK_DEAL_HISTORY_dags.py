@@ -34,7 +34,10 @@ with DAG(
             "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
             "spark.sql.sources.partitionOverwriteMode": "dynamic",
             "spark.eventLog.dir": "s3a://spark-logs/events",
-            "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp"
+            "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp",
+            "spark.executor.instances": "2",
+            "spark.executor.cores": "8",
+            "spark.executor.memory": "8g"
         },
         verbose=True
     )
