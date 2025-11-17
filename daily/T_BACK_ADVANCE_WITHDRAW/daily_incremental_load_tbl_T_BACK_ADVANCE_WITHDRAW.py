@@ -34,12 +34,6 @@ incremental_df = (
 #
 ###
 
-###---------------------------------INCREMENTAL LOAD DATA TO BRONZE LAYER---------------------------------
-#
-incremental_df.write.format("parquet").mode("append").save("s3a://warehouse/bronze/T_BACK_ADVANCE_WITHDRAW")
-#
-###
-
 ###---------------------------------INCREMENTAL LOAD DATA TO SILVER LAYER---------------------------------
 #
 silver_df  = (
@@ -47,15 +41,25 @@ silver_df  = (
                                 .withColumn("valid_from", current_timestamp())
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
-                                .withColumn("create_at", current_timestamp())
 )
 (
     silver_df.write.format("delta")
                 .mode("append").partitionBy("partition_date")
-                .option("path", "s3a://warehouse/silver/T_BACK_ADVANCE_WITHDRAW")
+                .option("path", "s3a://warehouse/silver/test_inc_T_BACK_ADVANCE_WITHDRAW") #test
                 .save()
 )
 #
 ###
+
+###---------------------------------TEST INCREMENTAL LOAD DATA TO SILVER LAYER---------------------------------
+#
+spark.sql("DROP TABLE IF EXISTS silver.test_inc_fact_T_BACK_ADVANCE_WITHDRAW")
+
+spark.sql("""
+    CREATE TABLE IF NOT EXISTS silver.test_inc_fact_T_BACK_ADVANCE_WITHDRAW
+    USING delta
+    LOCATION 's3a://warehouse/silver/test_inc_T_BACK_ADVANCE_WITHDRAW'
+""")
+#
 
 spark.stop()

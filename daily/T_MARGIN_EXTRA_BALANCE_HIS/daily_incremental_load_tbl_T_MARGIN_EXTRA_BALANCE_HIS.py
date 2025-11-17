@@ -34,12 +34,6 @@ incremental_df = (
 #
 ###
 
-###---------------------------------INCREMENTAL LOAD DATA TO BRONZE LAYER---------------------------------
-#
-incremental_df.write.format("parquet").mode("append").save("s3a://warehouse/bronze/T_MARGIN_EXTRA_BALANCE_HIS")
-#
-###
-
 ###---------------------------------INCREMENTAL LOAD DATA TO SILVER LAYER---------------------------------
 #
 silver_df  = (
@@ -47,16 +41,26 @@ silver_df  = (
                                 .withColumn("valid_from", current_timestamp())
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
-                                .withColumn("create_at", current_timestamp())
 )
 
 (
     silver_df.write.format("delta")
                 .mode("append").partitionBy("partition_date")
-                .option("path", "s3a://warehouse/silver/T_MARGIN_EXTRA_BALANCE_HIS")
+                .option("path", "s3a://warehouse/silver/test_inc_T_MARGIN_EXTRA_BALANCE_HIS")
                 .save()
 )
 #
 ###
+
+###---------------------------------TEST INCREMENTAL LOAD DATA TO SILVER LAYER---------------------------------
+#
+spark.sql("DROP TABLE IF EXISTS silver.test_inc_fact_T_MARGIN_EXTRA_BALANCE_HIS")
+
+spark.sql("""
+    CREATE TABLE IF NOT EXISTS silver.test_inc_fact_T_MARGIN_EXTRA_BALANCE_HIS
+    USING delta
+    LOCATION 's3a://warehouse/silver/test_inc_T_MARGIN_EXTRA_BALANCE_HIS'
+""")
+#
 
 spark.stop()
