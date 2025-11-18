@@ -1,12 +1,13 @@
 from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
 from datetime import datetime
+import pendulum
 
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
     dag_id="spark_daily_incremental_load_tbl_T_MARGIN_EXTRA_BALANCE_HIS",
-    start_date=datetime(2025, 11, 18),
+    start_date=pendulum.datetime(2025, 11, 17, tz="Asia/Ho_Chi_Minh"),
     schedule_interval="0 1 * * *",
     catchup=False,
     tags=["spark", "delta", "hive", "daily"]
