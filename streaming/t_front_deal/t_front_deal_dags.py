@@ -10,6 +10,7 @@ with DAG(
     start_date=datetime(2025, 10, 19),
     schedule_interval=timedelta(minutes=10),
     catchup=False,
+    is_paused_upon_creation=True,
     tags=["spark", "starrocks", "kafka", "debezium"]
 ) as dag:
 
