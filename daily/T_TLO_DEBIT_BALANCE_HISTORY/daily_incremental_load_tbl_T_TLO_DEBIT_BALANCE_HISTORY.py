@@ -45,21 +45,10 @@ silver_df  = (
 (
     silver_df.write.format("delta")
                 .mode("append").partitionBy("partition_date")
-                .option("path", "s3a://warehouse/silver/test_inc_T_TLO_DEBIT_BALANCE_HISTORY")
+                .option("path", "s3a://warehouse/silver/T_TLO_DEBIT_BALANCE_HISTORY")
                 .save()
 )
 #
 ###
-
-###---------------------------------TEST INCREMENTAL LOAD DATA TO SILVER LAYER---------------------------------
-#
-spark.sql("DROP TABLE IF EXISTS silver.test_inc_fact_T_TLO_DEBIT_BALANCE_HISTORY")
-
-spark.sql("""
-    CREATE TABLE IF NOT EXISTS silver.test_inc_fact_T_TLO_DEBIT_BALANCE_HISTORY
-    USING delta
-    LOCATION 's3a://warehouse/silver/test_inc_T_TLO_DEBIT_BALANCE_HISTORY'
-""")
-#
 
 spark.stop()
