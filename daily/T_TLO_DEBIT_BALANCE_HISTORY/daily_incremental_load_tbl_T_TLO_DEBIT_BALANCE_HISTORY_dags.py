@@ -6,8 +6,8 @@ default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
     dag_id="spark_daily_incremental_load_tbl_T_TLO_DEBIT_BALANCE_HISTORY",
-    start_date=datetime(2025, 10, 19),
-    schedule_interval=None,
+    start_date=datetime(2025, 11, 18),
+    schedule_interval="0 1 * * *",
     catchup=False,
     tags=["spark", "delta", "hive", "daily"]
 ) as dag:

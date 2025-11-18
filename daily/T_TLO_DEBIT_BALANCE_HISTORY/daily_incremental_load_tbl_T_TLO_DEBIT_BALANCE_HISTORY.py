@@ -25,7 +25,7 @@ incremental_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG["url"])
-        .option("dbtable", "(SELECT * FROM BACK.T_TLO_DEBIT_BALANCE_HISTORY WHERE C_TRANSACTION_DATE >= TRUNC(SYSDATE) AND C_TRANSACTION_DATE < TRUNC(SYSDATE) + 1) tbl")
+        .option("dbtable", "(SELECT * FROM BACK.T_TLO_DEBIT_BALANCE_HISTORY WHERE C_TRANSACTION_DATE >= TRUNC(SYSDATE) - 1 AND C_TRANSACTION_DATE < TRUNC(SYSDATE)) tbl")
         .option("user", DATABASE_CONFIG["user"])
         .option("password", DATABASE_CONFIG["password"])
         .option("driver", DATABASE_CONFIG["driver"])
