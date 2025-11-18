@@ -35,9 +35,13 @@ with DAG(
             "spark.sql.sources.partitionOverwriteMode": "dynamic",
             "spark.eventLog.dir": "s3a://spark-logs/events",
             "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp",
-            "spark.executor.instances": "1",
-            "spark.executor.cores": "2",
-            "spark.executor.memory": "4g"
+            # "spark.executor.instances": "1",
+            # "spark.executor.cores": "2",
+            # "spark.executor.memory": "8g",
+            "spark.executor.instances": "2",
+            "spark.executor.cores": "4",
+            "spark.executor.memory": "8g",
+            "spark.sql.shuffle.partitions": "16"
         },
         verbose=True
     )
