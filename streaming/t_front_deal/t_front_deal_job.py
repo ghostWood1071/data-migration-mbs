@@ -119,10 +119,12 @@ select_exprs.append(
 
 
 # updated_at: thời điểm event Debezium (ts_ms → timestamp)
+# select_exprs.append(
+#     (col("data.payload.ts_ms") / 1000).cast(TimestampType()).alias("updated_at")
+# )
 select_exprs.append(
-    (col("data.payload.ts_ms") / 1000).cast(TimestampType()).alias("updated_at")
+    F.from_utc_timestamp(F.from_unixtime(col("data.payload.ts_ms") / 1000), "Asia/Ho_Chi_Minh")
 )
-
 # op: Debezium operation 'c', 'u', 'd'
 select_exprs.append(
     col("data.payload.op").alias("op")
