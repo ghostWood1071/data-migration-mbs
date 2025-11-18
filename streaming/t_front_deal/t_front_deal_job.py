@@ -123,7 +123,7 @@ select_exprs.append(
 #     (col("data.payload.ts_ms") / 1000).cast(TimestampType()).alias("updated_at")
 # )
 select_exprs.append(
-    F.from_utc_timestamp(F.from_unixtime(col("data.payload.ts_ms") / 1000), "Asia/Ho_Chi_Minh")
+    F.from_utc_timestamp(F.from_unixtime(col("data.payload.ts_ms") / 1000), "Asia/Ho_Chi_Minh").alias("updated_at")
 )
 # op: Debezium operation 'c', 'u', 'd'
 select_exprs.append(
