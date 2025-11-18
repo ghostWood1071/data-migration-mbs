@@ -8,7 +8,7 @@ default_args = {"owner": "airflow", "retries": 0}
 with DAG(
     dag_id="spark_daily_incremental_load_tbl_T_BACK_ADVANCE_WITHDRAW",
     start_date=pendulum.datetime(2025, 11, 17, tz="Asia/Ho_Chi_Minh"),
-    schedule_interval="*/5 * * * *",
+    schedule_interval="0 1 * * *",
     catchup=False,
     tags=["spark", "delta", "hive", "daily"]
 ) as dag:
