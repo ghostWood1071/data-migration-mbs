@@ -15,7 +15,7 @@ with DAG(
 
     create_delta_job = SparkSubmitOperator(
         task_id="cdc_source2silver_t_back_account",
-        application="s3a://asset/spark-jobs/t_back_account_job.py",
+        application="s3a://asset/spark-jobs/update_timestamp.py",
         deploy_mode="cluster",
         name="cdc_source2silver_t_back_account",
         conn_id="spark_k8s",
