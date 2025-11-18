@@ -8,7 +8,7 @@ default_args = {"owner": "airflow", "retries": 0}
 with DAG(
     dag_id="cdc_source2silver_t_front_deal",
     start_date=datetime(2025, 10, 19),
-    schedule_interval=timedelta(minutes=10),
+    schedule_interval=timedelta(minutes=20),
     catchup=False,
     is_paused_upon_creation=True,
     tags=["spark", "starrocks", "kafka", "debezium"]
