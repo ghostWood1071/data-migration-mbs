@@ -91,7 +91,7 @@ df_kafka = (
     .format("kafka")
     .option("kafka.bootstrap.servers", "192.168.73.190:9092,192.168.73.191:9092,192.168.73.192:9092")
     .option("subscribe", "oracle-bo-poc.FRONT.T_FRONT_DEAL")
-    .option("startingOffsets", "earliest")
+    .option("startingOffsets", "latest")
     .load()
 )
 
@@ -112,18 +112,11 @@ select_exprs = []
 # PK_ACCOUNT: ưu tiên after, nếu delete thì lấy before
 select_exprs.append(
     coalesce(
-        col("data.payload.after.PK_ACCOUNT"),
-        col("data.payload.before.PK_ACCOUNT")
-    ).alias("PK_ACCOUNT")
+        col("data.payload.after.PK_FRONT_DEAL"),
+        col("data.payload.before.PK_FRONT_DEAL")
+    ).alias("PK_FRONT_DEAL")
 )
 
-# created_at: từ C_CREATE_TIME (ngày tạo account trong hệ thống gốc)
-select_exprs.append(
-    coalesce(
-        col("data.payload.after.C_CREATE_TIME"),
-        col("data.payload.before.C_CREATE_TIME")
-    ).alias("created_at")
-)
 
 # updated_at: thời điểm event Debezium (ts_ms → timestamp)
 select_exprs.append(
@@ -138,14 +131,14 @@ select_exprs.append(
 # Các cột business: lấy từ after.* (delete thì null, vẫn ok cho SCD2)
 for field in schema_after.fields:
     name = field.name
-    if name not in ["PK_ACCOUNT", "C_CREATE_TIME"]:
+    if name not in ["PK_FRONT_DEAL"]:
     # PK_ACCOUNT & C_CREATE_TIME đã map rồi, nhưng giữ C_CREATE_TIME business vẫn tốt
         select_exprs.append(col(f"data.payload.after.{name}").alias(name))
 
 df_scd2 = df_parsed.select(*select_exprs)
 df_scd2 = df_scd2.withColumn(
     "created_at",
-    F.when(F.col("op") == F.lit("c"), F.col("updated_at")).otherwise(F.col("created_at"))   
+    F.when(F.col("op") == F.lit("c"), F.col("updated_at"))
 ).withColumn(
     "partition_date",
     F.date_format(F.col("updated_at"), "yyyy-MM-dd")
@@ -158,11 +151,15 @@ print(df_scd2.columns)
 # 6. Write streaming ra Delta (append-only SCD2)
 # =========================
 
-(
+query = (
     df_scd2.writeStream
     .format("delta")
     .outputMode("append")
     .option("checkpointLocation", checkpoint_path)
     .start(delta_path)
-    .awaitTermination()
+    
 )
+
+query.awaitTermination(600)
+query.stop()
+spark.stop()

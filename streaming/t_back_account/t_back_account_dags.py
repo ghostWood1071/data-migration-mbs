@@ -1,13 +1,13 @@
 from airflow import DAG
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
-from datetime import datetime
+from datetime import datetime, timedelta
 
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
     dag_id="cdc_source2silver_t_back_account",
     start_date=datetime(2025, 10, 19),
-    schedule_interval=None,
+    schedule_interval=timedelta(minutes=10),
     catchup=False,
     tags=["spark", "starrocks", "kafka", "debezium"]
 ) as dag:

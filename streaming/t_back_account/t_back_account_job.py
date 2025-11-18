@@ -148,7 +148,7 @@ df_kafka = (
     .format("kafka")
     .option("kafka.bootstrap.servers", "192.168.73.190:9092,192.168.73.191:9092,192.168.73.192:9092")
     .option("subscribe", "oracle-bo-poc.BACK.T_BACK_ACCOUNT")
-    .option("startingOffsets", "earliest")
+    .option("startingOffsets", "latest")
     .load()
 )
 
@@ -215,11 +215,14 @@ print(df_scd2.columns)
 # 6. Write streaming ra Delta (append-only SCD2)
 # =========================
 
-(
+query = (
     df_scd2.writeStream
     .format("delta")
     .outputMode("append")
     .option("checkpointLocation", checkpoint_path)
     .start(delta_path)
-    .awaitTermination()
+    
 )
+query.awaitTermination(600)
+query.stop()
+spark.stop()
