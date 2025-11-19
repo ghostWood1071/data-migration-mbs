@@ -114,6 +114,9 @@ schema_after = StructType([
     StructField("C_CARE_PACKAGE", StringType(), True)
 ])
 
+cols = [f.name for f in schema_after.fields]
+cols_str = ", ".join(cols)
+
 schema_payload = StructType() \
     .add("before", schema_after) \
     .add("after", schema_after) \
@@ -148,29 +151,27 @@ select_exprs.append(
     ).alias("PK_ACCOUNT")
 )
 
-for field in schema_after.fields:
-    name = field.name
-    if name not in ["PK_ACCOUNT", "C_CREATE_TIME"]:
-        select_exprs.append(col(f"data.payload.after.{name}").alias(name))
-
-df_scd2 = df_parsed.select(*select_exprs)
-
-query = (
-    df_scd2.writeStream
-    .format("delta")
-    .outputMode("append")
-    .option("checkpointLocation", checkpoint_path)
-    .start(delta_path)
-    
+select_exprs.append(
+    F.when(col("data.payload.op").isin('c', 'u'), F.lit(0)).otherwise(1).alias("__op")
 )
 
+for field in schema_after.fields:
+    name = field.name
+    if name not in ["PK_ACCOUNT"]:
+        select_exprs.append(col(f"data.payload.after.{name}").alias(name))
+
+df_scd2 = df_parsed.select(*select_exprs).filter(~F.col("PK_ACCOUNT").isNull())
+cols_str = cols_str.split(", ")
+cols_str.append("__op")
+df_scd2 = df_scd2.select(*cols_str)
 query =(
-    df.writeStream.format("starrocks")
+    df_scd2.writeStream.format("starrocks")
      .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
      .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030")
      .option("starrocks.table.identifier", "mbs_realtime_db.t_back_account")
      .option("starrocks.user", "mbs_demo")
      .option("starrocks.password", "mbs_demo")
+     .option("starrocks.columns", ", ".join(cols_str))
      .option("checkpointLocation", checkpoint_path)
      .outputMode("append")
      .start()
