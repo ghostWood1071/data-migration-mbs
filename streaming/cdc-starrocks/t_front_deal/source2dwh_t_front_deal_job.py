@@ -131,6 +131,6 @@ query =(
      .start()
 )
 
-query.awaitTermination(600)
+query.awaitTermination()
 query.stop()
 spark.stop()
