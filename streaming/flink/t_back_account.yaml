@@ -1,0 +1,40 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: cdc-sql-dim-back-account
+  namespace: cdc
+spec:
+  # Image vừa build ở trên
+  image: ghostwood/flink-mbs:1.0.5
+
+  # Version Flink tương ứng với image (1.18.x -> v1_18)
+  flinkVersion: v1_18
+
+  serviceAccount: flink   # SA mà bạn đã dùng cho operator
+
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    state.backend: rocksdb
+    state.checkpoints.dir: s3a://warehouse/dim_back_account/checkpoints
+    state.savepoints.dir:  s3a://warehouse/dim_back_account/savepoints
+    execution.checkpointing.interval: "60s"
+
+  jobManager:
+    resource:
+      cpu: 1
+      memory: "1024m"
+  taskManager:
+    resource:
+      cpu: 2
+      memory: "2048m"
+
+  job:
+    # JAR sql-runner trong container
+    jarURI: local:///opt/flink/lib/flink-sql-runner-1.18.1-csaop1.0.0.jar
+
+    # Đường dẫn file SQL trong container
+    args:
+      - /opt/flink/usrlib/sql-scripts/cdc_kafka_starrocks.sql
+
+    parallelism: 2
+    upgradeMode: savepoint   # để sau này apply lại yaml nó tự savepoint + restart
