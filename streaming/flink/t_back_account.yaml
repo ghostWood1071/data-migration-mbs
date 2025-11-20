@@ -5,7 +5,7 @@ metadata:
   namespace: cdc
 spec:
   # Image vừa build ở trên
-  image: ghostwood/flink-mbs:1.0.6
+  image: ghostwood/flink-mbs:1.1.0
 
   # Version Flink tương ứng với image (1.18.x -> v1_18)
   flinkVersion: v1_18
