@@ -29,12 +29,8 @@ spec:
       memory: "2048m"
 
   job:
-    # JAR sql-runner trong container
     jarURI: local:///opt/flink/lib/flink-sql-runner-1.18.1-csaop1.0.0.jar
-
-    # Đường dẫn file SQL trong container
     args:
-      - /opt/flink/usrlib/sql-scripts/cdc_kafka_starrocks.sql
-
+      - /opt/flink/sql/dim_back_account.sql
     parallelism: 2
-    upgradeMode: savepoint   # để sau này apply lại yaml nó tự savepoint + restart
+    upgradeMode: savepoint  
