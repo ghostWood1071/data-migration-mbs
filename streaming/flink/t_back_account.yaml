@@ -35,7 +35,7 @@ spec:
       memory: "2048m"
 
   job:
-    jarURI: s3a://asset/flink-job/cdc-kafka-starrocks-1.0-SNAPSHOT.jar
+    jarURI: local:///opt/flink/lib/cdc-kafka-starrocks-1.0-SNAPSHOT.jar
     entryClass: org.mbs.DimBackAccount
     parallelism: 2
     upgradeMode: savepoint  
