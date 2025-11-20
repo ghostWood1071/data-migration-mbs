@@ -42,11 +42,22 @@ silver_df  = (
                                 .withColumn("valid_to", lit(None).cast(TimestampType()))
                                 .withColumn("is_current", lit(True))
 )
+# (
+#     silver_df.write.format("delta")
+#                 .mode("append").partitionBy("partition_date")
+#                 .option("path", "s3a://warehouse/silver/T_TLO_DEBIT_BALANCE_HISTORY")
+#                 .save()
+# )
+table_name = "fact_t_tlo_debit_balance_history"
 (
-    silver_df.write.format("delta")
-                .mode("append").partitionBy("partition_date")
-                .option("path", "s3a://warehouse/silver/T_TLO_DEBIT_BALANCE_HISTORY")
-                .save()
+    silver_df.write.format("starrocks")
+        .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
+        .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030")
+        .option(f"starrocks.table.identifier", "mbs_realtime_db.{table_name}")
+        .option("starrocks.user", "mbs_demo")
+        .option("starrocks.password", "mbs_demo")
+        .mode("append")
+        .save()
 )
 #
 ###

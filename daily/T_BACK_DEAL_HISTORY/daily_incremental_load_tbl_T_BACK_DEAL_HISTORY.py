@@ -53,11 +53,23 @@ silver_df  = (
 )
 
 
+# (
+#     silver_df.write.format("delta")
+#                 .mode("append").partitionBy("partition_date")
+#                 .option("path", "s3a://warehouse/silver/T_BACK_DEAL_HISTORY")
+#                 .save()
+# )
+
+table_name = "fact_t_back_deal_history"
 (
-    silver_df.write.format("delta")
-                .mode("append").partitionBy("partition_date")
-                .option("path", "s3a://warehouse/silver/T_BACK_DEAL_HISTORY")
-                .save()
+    silver_df.write.format("starrocks")
+        .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
+        .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030")
+        .option(f"starrocks.table.identifier", "mbs_realtime_db.{table_name}")
+        .option("starrocks.user", "mbs_demo")
+        .option("starrocks.password", "mbs_demo")
+        .mode("append")
+        .save()
 )
 #
 ###
