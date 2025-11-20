@@ -5,7 +5,7 @@ metadata:
   namespace: cdc
 spec:
   # Image vừa build ở trên
-  image: ghostwood/flink-mbs:1.0.5
+  image: ghostwood/flink-mbs:1.0.7
 
   # Version Flink tương ứng với image (1.18.x -> v1_18)
   flinkVersion: v1_18
@@ -18,6 +18,12 @@ spec:
     state.checkpoints.dir: s3a://warehouse/dim_back_account/checkpoints
     state.savepoints.dir:  s3a://warehouse/dim_back_account/savepoints
     execution.checkpointing.interval: "60s"
+    fs.s3a.endpoint: "http://minio.storage.svc.cluster.local:9000"
+    fs.s3a.access.key: "minioadmin"
+    fs.s3a.secret.key: "minio@demo!"
+    fs.s3a.path.style.access: "true"
+    fs.s3a.connection.ssl.enabled: "false"
+
 
   jobManager:
     resource:
@@ -29,147 +35,7 @@ spec:
       memory: "2048m"
 
   job:
-    jarURI: local:///opt/flink/lib/flink-sql-runner-1.18.1-csaop1.0.0.jar
-    args: 
-      - |
-        CREATE TABLE t_back_account_cdc (
-          PK_ACCOUNT STRING,
-          C_ACCOUNT_BRANCH_CODE STRING,
-          C_ACCOUNT_SUB_BRANCH_CODE STRING,
-          C_CREATOR_CODE STRING,
-          C_CREATOR_BRANCH_CODE STRING,
-          C_CREATOR_SUB_BRANCH_CODE STRING,
-          C_CREATE_TIME TIMESTAMP,           
-          C_APPROVER_CODE STRING,
-          C_APPROVE_TIME TIMESTAMP,
-          C_CUSTOMER_CODE STRING,
-          C_ACCOUNT_CODE STRING,
-          C_ACCOUNT_TYPE STRING,
-          C_ACCOUNT_FRONT_TYPE STRING,
-          C_ACCOUNT_RELATION_TYPE STRING,
-          C_STAFF_FLAG STRING,
-          C_MARKETING_ID STRING,
-          C_TAX_FLAG STRING,
-          C_OPEN_DATE TIMESTAMP,
-          C_CLOSE_DATE TIMESTAMP,
-          C_BANK_CODE STRING,
-          C_BANK_ACCOUNT STRING,
-          C_COMM_PACKAGE STRING,
-          C_ACCOUNT_STATUS STRING,
-          C_CLOSER_CODE STRING,
-          C_CLOSE_TIME TIMESTAMP,
-          C_NEW_CUST_EXPIRE_DATE TIMESTAMP,
-          C_COLLABORATOR STRING,
-          C_MODIFY_USER_CODE STRING,
-          C_RESTRICTION_ID STRING,
-          C_CHANNEL STRING,
-          C_GROUP_CODE STRING,
-          C_ACCOUNT_CREDIT_TYPE DOUBLE,
-          C_ORIGIN_ACCOUNT_CODE STRING,
-          C_ACCOUNT_LEVEL STRING,
-          C_CAN_SHORT_SELL STRING,
-          C_CAN_OVER_CREDIT STRING,
-          C_FORCE_SELL STRING,
-          C_LENDING_SELL STRING,
-          C_TRADING_STATUS DOUBLE,
-          C_ONLINE_ACCOUNT_TYPE STRING,
-          C_SUB_MARKETING_ID STRING,
-          C_CHANGED_TAB STRING,
-          C_TC_SIGNED_STATUS DOUBLE,
-          C_ODD_LOT_CONTRACT_SIGNED DOUBLE,
-          C_ODD_LOT_CONTRACT_NOTE STRING,
-          C_DEPOSIT_APPROVER_CODE STRING,
-          C_DEPOSIT_APPROVE_DATE TIMESTAMP,
-          C_COMM_BASE_RATE DOUBLE,
-          C_ATS_FLAG DOUBLE,
-          C_ATS_BANK_ACCOUNT STRING,
-          C_ATS_BANK STRING,
-          C_BANK_RESPONSE_MAPPING STRING,
-          C_RESPONSE_MAPPING_TIME TIMESTAMP,
-          C_BANK_RESPONSE_UNMAPPING STRING,
-          C_RESPONSE_UNMAPPING_TIME TIMESTAMP,
-          C_VSD_STATUS STRING,
-          C_VSD_RESPONSE STRING,
-          C_VSD_OPEN_FLAG DOUBLE,
-          C_VSD_CLOSE_FLAG DOUBLE,
-          C_COMM_START_DATE TIMESTAMP,
-          C_COMM_EXPIRE_DATE TIMESTAMP,
-          C_RECEIVE_FINAN_BILL DOUBLE,
-          C_VSD_OPEN_STATUS STRING,
-          C_VSD_OPEN_RESPONSE STRING,
-          C_VSD_OPEN_LOCATION STRING,
-          C_VSD_CLOSE_STATUS STRING,
-          C_VSD_CLOSE_RESPONSE STRING,
-          C_VSD_CLOSE_LOCATION STRING,
-          C_VSD_OPEN_DATE TIMESTAMP,
-          C_VSD_CLOSE_DATE TIMESTAMP,
-          C_RECEIVED_FEE_CLOSE_ACC DOUBLE,
-          C_CONFIRM_TYPE STRING,
-          C_CONFIRM_USER STRING,
-          FK_CONFIRM_CUSTOMER STRING,
-          C_FILE_STATUS STRING,
-          C_FILE_CONFIRM_DATE TIMESTAMP,
-          C_FILE_COMPLETING_LOCATION DOUBLE,
-          C_IS_NEW_CUSTOMER DOUBLE,
-          C_FILE_CONFIRM_USER STRING,
-          C_FILE_CONFIRM_NOTE STRING,
-          C_SOFT_FILE_STATUS STRING,
-          C_SOFT_FILE_REJECT_REASON STRING,
-          C_SOFT_FILE_REJECT_DATE TIMESTAMP,
-          C_FILE_STATUS_USER STRING,
-          C_ADDRESS_SAVE_INFOR STRING,
-          C_CUST_CARE_SERVICE_TYPE STRING,
-          C_ATS_BANK_BRANCH_CD STRING,
-          C_IS_ONBOARD DOUBLE,
-          C_COPI24_TYPE STRING,
-          C_VSD_OPEN_SEND_TIME TIMESTAMP,
-          C_FOR_TRADING_BOND DOUBLE,
-          C_VSD_FIRST_OPEN_SEND_TIME TIMESTAMP,
-          C_CARE_PACKAGE STRING,
-          -- KHAI BÁO PRIMARY KEY giống Oracle
-          PRIMARY KEY (PK_ACCOUNT) NOT ENFORCED
-        ) WITH (
-          'connector' = 'kafka',
-          'topic' = 'oracle-bo-poc.BACK.T_BACK_ACCOUNT',
-          'properties.bootstrap.servers' = '192.168.73.190:9092,192.168.73.191:9092,192.168.73.192:9092',
-          'properties.group.id' = 'flink_t_back_account',
-          'scan.startup.mode' = 'earliest-offset',
-          'format' = 'debezium-json',
-          'debezium-json.schema-include' = 'true'
-        );
-
-
-        CREATE TABLE dim_back_account (
-            C_ORIGIN_ACCOUNT_CODE STRING,
-            C_ACCOUNT_CODE STRING,
-            C_OPEN_DATE TIMESTAMP,
-            C_BRANCH_NAME STRING,
-            C_CHANNEL_NAME STRING
-            PRIMARY KEY (C_ORIGIN_ACCOUNT_CODE) NOT ENFORCED
-        ) WITH (
-          'connector' = 'starrocks',
-          'jdbc-url' = 'jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030',
-          'load-url' = 'kube-starrocks-fe-service.warehouse.svc.cluster.local:8030',
-          'database-name' = 'mbs_golden',
-          'table-name' = 'dim_back_account',
-          'username' = 'mbs_demo',
-          'password' = 'mbs_demo'
-        );
-
-        INSERT INTO dim_back_account
-        SELECT 
-            SUBSTRING(C_ACCOUNT_CODE FROM 1 FOR 6) AS C_ORIGIN_ACCOUNT_CODE,
-            C_ACCOUNT_CODE,
-            C_OPEN_DATE,
-            CASE 
-                WHEN C_ACCOUNT_BRANCH_CODE = '17' THEN 'KDS'
-                ELSE 'SSG'
-            END AS C_BRANCH_NAME,
-            CASE 
-                WHEN C_CHANNEL = 'MBB' THEN 'MB'
-                ELSE 'MBS'
-            END AS C_CHANNEL_NAME
-        FROM t_back_account_cdc
-        WHERE C_ACCOUNT_CODE IS NOT NULL;
+    jarURI: s3a://asset/flink-job/cdc-kafka-starrocks-1.0-SNAPSHOT.jar
+    entryClass: org.mbs.DimBackAccount
     parallelism: 2
     upgradeMode: savepoint  
