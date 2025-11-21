@@ -5,8 +5,6 @@ from pyspark.sql.types import TimestampType
 spark = (
     SparkSession.builder
     .appName("CreateDeltaTables")
-    .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
-    .config("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
     .enableHiveSupport()
     .getOrCreate()
 )
@@ -19,13 +17,14 @@ DATABASE_CONFIG = {
     "driver": "oracle.jdbc.driver.OracleDriver"
 }
 
+
 ###---------------------------------READ DATA FROM ORACLE DB---------------------------------
 #
-incremental_df = (
+V_T_BACK_ACCOUNT_df = (
     spark.read
         .format("jdbc")
         .option("url", DATABASE_CONFIG["url"])
-        .option("dbtable", "(SELECT * FROM BACK.T_TLO_DEBIT_BALANCE_HISTORY WHERE C_TRANSACTION_DATE >= TRUNC(SYSDATE) - 1 AND C_TRANSACTION_DATE < TRUNC(SYSDATE)) tbl")
+        .option("dbtable", "MISUSER.V_T_BACK_ACCOUNT")
         .option("user", DATABASE_CONFIG["user"])
         .option("password", DATABASE_CONFIG["password"])
         .option("driver", DATABASE_CONFIG["driver"])
@@ -34,23 +33,13 @@ incremental_df = (
 #
 ###
 
-###---------------------------------INCREMENTAL LOAD DATA TO SILVER LAYER---------------------------------
+###---------------------------------LOAD DATA TO STARROCKS---------------------------------
 #
-silver_df  = (
-    incremental_df.withColumn("partition_date", to_date("C_TRANSACTION_DATE", "yyyy-MM-dd"))
-                                .withColumn("valid_from", current_timestamp())
-                                .withColumn("valid_to", lit(None).cast(TimestampType()))
-                                .withColumn("is_current", lit(True))
-)
-# (
-#     silver_df.write.format("delta")
-#                 .mode("append").partitionBy("partition_date")
-#                 .option("path", "s3a://warehouse/silver/T_TLO_DEBIT_BALANCE_HISTORY")
-#                 .save()
-# )
-table_name = "fact_t_tlo_debit_balance_history"
+V_T_BACK_ACCOUNT_df.select("C_ACCOUNT_CODE", "C_OPEN_DATE")
+
+table_name = "dim_v_t_back_account"
 (
-    silver_df.write.format("starrocks")
+    V_T_BACK_ACCOUNT_df.write.format("starrocks")
         .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
         .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030")
         .option("starrocks.table.identifier", f"mbs_realtime_db.{table_name}")
@@ -59,7 +48,6 @@ table_name = "fact_t_tlo_debit_balance_history"
         .mode("append")
         .save()
 )
-#
 ###
 
 spark.stop()
