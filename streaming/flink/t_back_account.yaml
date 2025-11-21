@@ -4,13 +4,9 @@ metadata:
   name: cdc-sql-dim-back-account
   namespace: cdc
 spec:
-  # Image vừa build ở trên
   image: ghostwood/flink-mbs:1.1.2
-
-  # Version Flink tương ứng với image (1.18.x -> v1_18)
   flinkVersion: v1_18
-
-  serviceAccount: flink   # SA mà bạn đã dùng cho operator
+  serviceAccount: flink   
 
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
@@ -35,7 +31,8 @@ spec:
       memory: "2048m"
 
   job:
-    jarURI: local:///opt/flink/lib/cdc-kafka-starrocks-1.0-SNAPSHOT.jar
+    # jarURI: local:///opt/flink/lib/cdc-kafka-starrocks-1.0-SNAPSHOT.jar
+    jarURI: s3a://asset/flink-job/cdc-kafka-starrocks-1.0-SNAPSHOT.jar
     entryClass: org.mbs.DimBackAccount
     parallelism: 2
     upgradeMode: savepoint  
