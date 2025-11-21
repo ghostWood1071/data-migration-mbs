@@ -344,15 +344,28 @@ CREATE TABLE default_catalog.mbs_golden.back_data(
 	C_DATE date,
 	C_MONTH int,
 	C_YEAR int,
-	C_MARGIN_DEBT int,
-	C_MBLINK_DEBT int,
-	C_UTTB int,
-	C_GTGD int,
+	C_MARGIN_DEBT DECIMAL(38,6),
+	C_MBLINK_DEBT DECIMAL(38,6),
+	C_UTTB DECIMAL(38,6),
+	C_GTGD DECIMAL(38,6),
 	C_RANKING_KEY varchar(65533),
   C_KY_KPI varchar(65533)
 )
 PRIMARY KEY (C_ACCOUNT_CODE)
 DISTRIBUTED BY HASH(C_ACCOUNT_CODE) BUCKETS 2
+PROPERTIES(
+	"replication_num" = "2"
+)
+
+CREATE TABLE default_catalog.mbs_golden.dim_erc_ranking(
+	C_ORIGIN_ACCOUNT_CODE varchar(65533),
+	C_YEAR_ADJ int,
+	C_MONTH_ADJ int,
+	C_SYNTHETIC_ANNOUCED_RANKING varchar(65533),
+	C_RANKING_KEY varchar(65533)
+)
+PRIMARY KEY (C_ORIGIN_ACCOUNT_CODE)
+DISTRIBUTED BY HASH(C_ORIGIN_ACCOUNT_CODE) BUCKETS 2
 PROPERTIES(
 	"replication_num" = "2"
 )
@@ -372,3 +385,32 @@ SELECT
 FROM default_catalog.mbs_realtime_db.t_back_account t
 JOIN default_catalog.mbs_realtime_db.dim_v_t_back_account v
 ON t.C_ACCOUNT_CODE = v.C_ACCOUNT_CODE
+
+
+CREATE MATERIALIZED VIEW default_catalog.mbs_realtime_db.mv_dim_erc_ranking
+DISTRIBUTED BY HASH(C_ORIGIN_ACCOUNT_CODE) BUCKETS 2
+REFRESH ASYNC EVERY (INTERVAL 60 SECOND)
+PROPERTIES(
+	"replication_num" = "2"
+)
+AS
+with adjusted_erc as (
+	SELECT
+		DISTINCT 
+		C_ORIGIN_ACCOUNT_CODE,
+		CASE
+			WHEN C_MONTH = 12 THEN C_YEAR + 1
+			ELSE C_YEAR
+		END AS C_YEAR_ADJ,
+		CASE
+			WHEN C_MONTH = 12 THEN 1
+			ELSE C_MONTH + 1
+		END AS C_MONTH_ADJ,
+		C_SYNTHETIC_ANNOUCED_RANKING
+	FROM
+		default_catalog.mbs_realtime_db.fact_v_t_erc_monthly_detail
+)
+SELECT
+	*,
+	CONCAT(C_ORIGIN_ACCOUNT_CODE, '_', C_YEAR_ADJ, '_', C_MONTH_ADJ) AS C_RANKING_KEY
+FROM adjusted_erc   
