@@ -339,6 +339,23 @@ PROPERTIES (
     "replication_num" = "2"
 )
 
+CREATE TABLE default_catalog.mbs_golden.back_data(
+	C_ACCOUNT_CODE varchar(65533),
+	C_DATE date,
+	C_MONTH int,
+	C_YEAR int,
+	C_MARGIN_DEBT int,
+	C_MBLINK_DEBT int,
+	C_UTTB int,
+	C_GTGD int,
+	C_RANKING_KEY varchar(65533),
+  C_KY_KPI varchar(65533)
+)
+PRIMARY KEY (C_ACCOUNT_CODE)
+DISTRIBUTED BY HASH(C_ACCOUNT_CODE) BUCKETS 2
+PROPERTIES(
+	"replication_num" = "2"
+)
 
 CREATE MATERIALIZED VIEW default_catalog.mbs_realtime_db.mv_t_back_account
 DISTRIBUTED BY HASH(C_ACCOUNT_CODE) BUCKETS 2
