@@ -58,7 +58,7 @@ table_name = "fact_t_back_advance_withdraw"
     silver_df.write.format("starrocks")
         .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
         .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030")
-        .option(f"starrocks.table.identifier", "mbs_realtime_db.{table_name}")
+        .option("starrocks.table.identifier", f"mbs_realtime_db.{table_name}")
         .option("starrocks.user", "mbs_demo")
         .option("starrocks.password", "mbs_demo")
         .mode("append")
