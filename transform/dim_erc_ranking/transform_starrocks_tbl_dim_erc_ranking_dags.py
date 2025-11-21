@@ -5,7 +5,7 @@ from datetime import datetime
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
-    dag_id="spark_transform_starrocks_tbl_back_data",
+    dag_id="spark_transform_starrocks_tbl_dim_erc_ranking",
     start_date=datetime(2025, 10, 19),
     schedule_interval=None,
     catchup=False,
@@ -13,10 +13,10 @@ with DAG(
 ) as dag:
 
     load_from_db_to_starrocks = SparkSubmitOperator(
-        task_id="transform_starrocks_tbl_back_data",
-        application="s3a://asset/spark-jobs/transform_starrocks_tbl_back_data.py",
+        task_id="transform_starrocks_tbl_dim_erc_ranking",
+        application="s3a://asset/spark-jobs/transform_starrocks_tbl_dim_erc_ranking.py",
         deploy_mode="cluster",
-        name="spark-transform_starrocks_tbl_back_data",
+        name="spark-transform_starrocks_tbl_dim_erc_ranking",
         conn_id="spark_k8s",
         conf={
             "spark.kubernetes.namespace": "compute",
@@ -34,10 +34,7 @@ with DAG(
             "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
             "spark.sql.sources.partitionOverwriteMode": "dynamic",
             "spark.eventLog.dir": "s3a://spark-logs/events",
-            "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp",
-            "spark.executor.instances": "2",
-            "spark.executor.cores": "8",
-            "spark.executor.memory": "8g",
+            "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp"
         },
         verbose=True
     )

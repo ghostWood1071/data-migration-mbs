@@ -26,6 +26,7 @@ def load_data_to_tbl_in_starrocks(transformed_df, table_name):
         .option("starrocks.table.identifier", f"mbs_golden.{table_name}")
         .option("starrocks.user", "mbs_demo")
         .option("starrocks.password", "mbs_demo")
+        .option("starrocks.read.max_string_length", "1048576")
         .mode("append")
         .save()
     )
@@ -128,7 +129,11 @@ FULL OUTER JOIN back_deal_history d
 		AND COALESCE(m.C_DATE, t.C_DATE, b.C_DATE) = d.C_DATE
 )
 SELECT
-	ot.*
+	ot.*,
+	CASE
+		WHEN C_MONTH BETWEEN 1 AND 6 THEN CONCAT(C_YEAR, ' Ky 1')
+		ELSE CONCAT(C_YEAR, ' Ky 2')
+	END AS C_KY_KPI
 FROM
 	OUTER_TABLE ot       
 """)
