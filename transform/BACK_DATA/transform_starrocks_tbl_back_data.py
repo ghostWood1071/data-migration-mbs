@@ -138,7 +138,9 @@ FROM
 	OUTER_TABLE ot       
 """)
 
-load_data_to_tbl_in_starrocks(transformed_df, "back_data")
+load_data_to_tbl_in_starrocks(transformed_df, "t_back_data")
+
+spark.stop()
 
 
 
