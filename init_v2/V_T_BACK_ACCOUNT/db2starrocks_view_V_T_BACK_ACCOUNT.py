@@ -35,11 +35,11 @@ V_T_BACK_ACCOUNT_df = (
 
 ###---------------------------------LOAD DATA TO STARROCKS---------------------------------
 #
-V_T_BACK_ACCOUNT_df.select("C_ACCOUNT_CODE", "C_OPEN_DATE")
+transformed_df = V_T_BACK_ACCOUNT_df.select("C_ACCOUNT_CODE", "C_OPEN_DATE")
 
 table_name = "dim_v_t_back_account"
 (
-    V_T_BACK_ACCOUNT_df.write.format("starrocks")
+    transformed_df.write.format("starrocks")
         .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
         .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030")
         .option("starrocks.table.identifier", f"mbs_realtime_db.{table_name}")
