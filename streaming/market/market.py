@@ -6,10 +6,24 @@ from pyspark.sql.types import (
 )
 import pyspark.sql.functions as F
 from pyspark.sql.protobuf.functions import from_protobuf
+from minio import Minio
+from minio.error import S3Error
 
 # =========================
 # 1. SparkSession Config
 # =========================
+
+client = Minio(
+    "minio.storage.svc.cluster.local:9000",  # Địa chỉ MinIO server, ví dụ "localhost:9000"
+    access_key="minioadmin",  # Thay bằng access key của bạn
+    secret_key="minio@demo!",  # Thay bằng secret key của bạn
+    secure=False  # True nếu MinIO của bạn sử dụng HTTPS
+)
+
+# Tên bucket và file cần tải
+bucket_name = "asset"
+file_name = "asset/decoder/schema_combined.desc"  # Tên file trên MinIO
+download_path = "schema_combined.desc" 
 
 spark = (
     SparkSession.builder
@@ -37,7 +51,7 @@ LOCATION '{delta_path}'
 # =========================
 # 3. Read Debezium CDC from Kafka
 # =========================
-desc_file = "/opt/spark/conf/schema_combined.desc"
+desc_file = "schema_combined.desc"
 df_kafka = (
     spark.readStream
     .format("kafka")
