@@ -15,7 +15,7 @@ with DAG(
 
     create_delta_job = SparkSubmitOperator(
         task_id="market_raw_task",
-        application="s3a://asset/spark-jobs/t_back_account_job.py",
+        application="s3a://asset/spark-jobs/market.py",
         deploy_mode="cluster",
         name="market_raw_task",
         conn_id="spark_k8s",

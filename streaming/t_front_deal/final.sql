@@ -60,7 +60,7 @@ margin_balance_hist AS (
     	YEAR(C_TRADING_DATE)  AS C_YEAR,
     	SUM(C_INTERM_LOAN - C_INTERM_LOAN_OUT + C_OUTTERM_LOAN - C_OUTTERM_LOAN_OUT) AS C_MARGIN_DEBT
     FROM fact_t_margin_extra_balance_his
-    GROUP BY C_ACCOUNT_CODE, C_TRADING_DATE
+    GROUP BY C_ACCOUNT_CODE, C_TRADING_DATE 
 ),
 tlo_balance_hist AS (
 	SELECT 
@@ -143,3 +143,5 @@ FROM (
     WHERE DATE(updated_at) = CURDATE()
 ) sub
 GROUP BY 1, 2;
+
+
