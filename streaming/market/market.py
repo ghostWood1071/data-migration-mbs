@@ -66,7 +66,6 @@ df = df.select(
     F.split(F.col("msg.type_url"), "\/")[1].cast("string").alias("class"), 
     F.col("msg.value").alias("body")
 )
-df = df.select(from_protobuf("body", "google.protobuf.Any", desc_file).alias("msg"))
 
 message_cls = [
     "ForeignRoom",
