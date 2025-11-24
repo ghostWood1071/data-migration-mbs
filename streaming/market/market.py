@@ -5,6 +5,7 @@ from pyspark.sql.types import (
     StringType, DoubleType, TimestampType, LongType
 )
 import pyspark.sql.functions as F
+from pyspark.sql.protobuf.functions import from_protobuf
 
 # =========================
 # 1. SparkSession Config
@@ -36,7 +37,7 @@ LOCATION '{delta_path}'
 # =========================
 # 3. Read Debezium CDC from Kafka
 # =========================
-
+desc_file = "/opt/spark/conf/schema_combined.desc"
 df_kafka = (
     spark.readStream
     .format("kafka")
