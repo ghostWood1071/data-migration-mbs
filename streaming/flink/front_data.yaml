@@ -33,6 +33,6 @@ spec:
   job:
     jarURI: local:///opt/flink/lib/streaming-starrocks-1.0-SNAPSHOT.jar
     # jarURI: s3a://asset/flink-job/cdc-kafka-starrocks-1.0-SNAPSHOT.jar
-    entryClass: org.mbs.T_FrontData
+    entryClass: org.mbs.FrontData
     parallelism: 2
     upgradeMode: savepoint  
