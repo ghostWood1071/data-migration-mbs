@@ -19,7 +19,7 @@ def get_data_from_starrocks(table_name: str,  partition_col: str = None, date: i
             .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
             .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030")
             .option("starrocks.table.identifier", f"mbs_realtime_db.{table_name}")
-            .option("starrocks.filter.query", f"{partition_col} = {date}")
+            .option("starrocks.filter.query", f"{partition_col} = '{date}'")
             .option("starrocks.user", "mbs_demo")
             .option("starrocks.password", "mbs_demo")
             .load()
@@ -51,8 +51,7 @@ fact_t_back_advance_withdraw_df.createOrReplaceTempView("tv_fact_t_back_advance_
 fact_t_back_deal_history_df.createOrReplaceTempView("tv_fact_t_back_deal_history")
 
 
-sql = """
-	INSERT INTO mbs_golden.test_back_data
+transformed_df = spark.sql("""
 	WITH 
 	margin_balance_hist AS (
 	SELECT
@@ -147,16 +146,10 @@ sql = """
 		END AS C_KY_KPI
 	FROM
 		OUTER_TABLE ot
-"""
+""")
+print("---------------LENGTH------------------")
+print(transformed_df.count())
 
-
-url = "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030"
-user = "mbs_demo"
-password = "mbs_demo"
-
-spark._sc._gateway.jvm.java.sql.DriverManager.getConnection(
-	url, user, password
-).createStatement().execute(sql)
-
+load_data_to_tbl_in_starrocks(transformed_df, "back_data")
 
 spark.stop()
