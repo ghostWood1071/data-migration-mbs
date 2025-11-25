@@ -22,6 +22,6 @@ def truncate_starrocks_table(db: str, table: str):
         url, user, password
     ).createStatement().execute(truncate_sql)
 
-truncate_starrocks_table("mbs_realtime_db", "test")
+truncate_starrocks_table("mbs_realtime_db", "t_front_deal")
 
 spark.stop()

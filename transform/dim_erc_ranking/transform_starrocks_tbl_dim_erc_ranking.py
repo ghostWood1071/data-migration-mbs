@@ -24,7 +24,6 @@ def load_data_to_tbl_in_starrocks(transformed_df, table_name):
         .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
         .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030")
         .option("starrocks.table.identifier", f"mbs_golden.{table_name}")
-        .option("starrocks.filter.query.merge", "false")
         .option("starrocks.user", "mbs_demo")
         .option("starrocks.password", "mbs_demo")
         .mode("append")
@@ -33,30 +32,38 @@ def load_data_to_tbl_in_starrocks(transformed_df, table_name):
 
 
 fact_v_t_erc_monthly_detail_df = get_data_from_starrocks("fact_v_t_erc_monthly_detail")
-
 fact_v_t_erc_monthly_detail_df.createOrReplaceTempView("tv_fact_v_t_erc_monthly_detail")
 
-transformed_df = spark.sql("""
-with adjusted_erc as (
-	SELECT DISTINCT
-		C_ORIGIN_ACCOUNT_CODE,
-		CASE
-			WHEN C_MONTH = 12 THEN C_YEAR + 1
-			ELSE C_YEAR
-		END AS C_YEAR_ADJ,
-		CASE
-			WHEN C_MONTH = 12 THEN 1
-			ELSE C_MONTH + 1
-		END AS C_MONTH_ADJ,
-		C_SYNTHETIC_ANNOUCED_RANKING
-	FROM
-		tv_fact_v_t_erc_monthly_detail
+df = spark.sql("""
+    SELECT
+        C_ORIGIN_ACCOUNT_CODE,
+        CASE
+            WHEN C_MONTH = 12 THEN C_YEAR + 1
+            ELSE C_YEAR
+        END AS C_YEAR_ADJ,
+        CASE
+            WHEN C_MONTH = 12 THEN 1
+            ELSE C_MONTH + 1
+        END AS C_MONTH_ADJ,
+        C_SYNTHETIC_ANNOUCED_RANKING
+    FROM
+        tv_fact_v_t_erc_monthly_detail
+"""
 )
-SELECT
-	*,
-	CONCAT(C_ORIGIN_ACCOUNT_CODE, '_', C_YEAR_ADJ, '_', C_MONTH_ADJ) AS C_RANKING_KEY
-FROM adjusted_erc     
+
+distinct_df = df.distinct()
+print("----------------------LENGTH------------------------")
+print(distinct_df.count())
+distinct_df.createOrReplaceTempView("tv_adjusted_erc")
+
+transformed_df = spark.sql("""
+    SELECT
+        *,
+        CONCAT(C_ORIGIN_ACCOUNT_CODE, '_', C_YEAR_ADJ, '_', C_MONTH_ADJ) AS C_RANKING_KEY
+    FROM tv_adjusted_erc       
 """)
+ 
+print(transformed_df.count())
 
 load_data_to_tbl_in_starrocks(transformed_df, "dim_erc_ranking")
 
