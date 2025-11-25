@@ -4,7 +4,7 @@ metadata:
   name: front-data
   namespace: cdc
 spec:
-  image: chiennc4805/flink-mbs:1.0.3
+  image: chiennc4805/flink-mbs:1.0.5
   flinkVersion: v1_18
   serviceAccount: flink   
 
@@ -31,8 +31,8 @@ spec:
       memory: "2048m"
 
   job:
-    jarURI: local:///opt/flink/lib/streaming-tbl-starrocks-1.0-SNAPSHOT.jar
+    jarURI: local:///opt/flink/lib/streaming-starrocks-1.0-SNAPSHOT.jar
     # jarURI: s3a://asset/flink-job/cdc-kafka-starrocks-1.0-SNAPSHOT.jar
-    entryClass: org.mbs.FrontData
+    entryClass: org.mbs.T_FrontData
     parallelism: 2
     upgradeMode: savepoint  
