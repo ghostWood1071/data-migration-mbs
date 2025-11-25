@@ -22,7 +22,9 @@ with DAG(
         conf={
             "spark.databricks.delta.schema.autoMerge.enabled": "true",
             "spark.kubernetes.namespace": "compute",
-            "spark.kubernetes.container.image": "ghostwood/mbs-spark:1.0.7-protobuf",
+            "spark.kubernetes.driver.podTemplateFile": "s3a://asset/decoder/driver.yaml",
+            "spark.kubernetes.executor.podTemplateFile": "s3a://asset/decoder/driver.yaml",
+            # "spark.kubernetes.container.image": "ghostwood/mbs-spark:1.0.7-protobuf",
             # "spark.executor.instances": 3,
             # "spark.executor.cores": 2,
             # "spark.sql.shuffle.partitions": 6,
