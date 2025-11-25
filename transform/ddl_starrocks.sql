@@ -357,6 +357,24 @@ PROPERTIES(
 	"replication_num" = "2"
 )
 
+CREATE TABLE default_catalog.mbs_golden.front_data(
+	C_ORIGIN_ACCOUNT_CODE varchar(1048576),
+	C_ACCOUNT_CODE varchar(1048576),
+	C_DATE date,
+	C_MONTH tinyint(4),
+	C_YEAR smallint(6),
+	C_MARGIN_DEBT DECIMAL(38,0),
+	C_MBLINK_DEBT DECIMAL(38,0),
+	C_UTTB DECIMAL(38,10),
+	C_GTGD DECIMAL(38,18),
+	C_RANKING_KEY varchar(1048576),
+  C_KY_KPI varchar(1048576)
+)
+DISTRIBUTED BY HASH(C_ORIGIN_ACCOUNT_CODE) BUCKETS 4
+PROPERTIES(
+	"replication_num" = "2"
+)
+
 CREATE TABLE default_catalog.mbs_golden.dim_erc_ranking(
 	C_ORIGIN_ACCOUNT_CODE varchar(65533),
 	C_YEAR_ADJ int,
