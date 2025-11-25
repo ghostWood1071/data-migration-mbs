@@ -22,8 +22,8 @@ with DAG(
         conf={
             "spark.databricks.delta.schema.autoMerge.enabled": "true",
             "spark.kubernetes.namespace": "compute",
-            "spark.kubernetes.driver.podTemplateFile": "s3a://asset/decoder/driver.yaml",
-            "spark.kubernetes.executor.podTemplateFile": "s3a://asset/decoder/driver.yaml",
+            "spark.kubernetes.driver.podTemplateFile": "/opt/airflow/dags/driver.yaml",
+            "spark.kubernetes.executor.podTemplateFile": "/opt/airflow/dags/driver.yaml",
             "spark.kubernetes.container.image": "ghostwood/mbs-spark:1.0.7-protobuf",
             # "spark.executor.instances": 3,
             # "spark.executor.cores": 2,
@@ -41,7 +41,7 @@ with DAG(
             "spark.hadoop.fs.s3a.path.style.access": "true",
             "spark.hadoop.fs.s3a.impl": "org.apache.hadoop.fs.s3a.S3AFileSystem",
             "spark.sql.sources.partitionOverwriteMode": "dynamic",
-            "conf spark.eventLog.dir": "s3a://spark-logs/events",
+            "spark.eventLog.dir": "s3a://spark-logs/events",
             "spark.driver.extraJavaOptions": "-Divy.cache.dir=/tmp -Divy.home=/tmp"
         },
         verbose=True
