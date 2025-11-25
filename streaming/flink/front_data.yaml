@@ -4,7 +4,7 @@ metadata:
   name: front-data
   namespace: cdc
 spec:
-  image: chiennc4805/flink-mbs:1.0.5
+  image: chiennc4805/flink-mbs:1.0.6
   flinkVersion: v1_18
   serviceAccount: flink   
 
