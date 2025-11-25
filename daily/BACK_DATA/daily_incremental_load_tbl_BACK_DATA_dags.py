@@ -6,18 +6,18 @@ import pendulum
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
-    dag_id="spark_daily_incremental_load_data_tbl_BACK_DATA",
+    dag_id="spark_daily_incremental_load_tbl_BACK_DATA",
     start_date=pendulum.datetime(2025, 11, 17, tz="Asia/Ho_Chi_Minh"),
-    schedule_interval="0 1 * * *",
+    schedule_interval="0 2 * * *",
     catchup=False,
     tags=["spark", "delta", "hive", "daily"]
 ) as dag:
 
     daily_incremental_load = SparkSubmitOperator(
-        task_id="daily_incremental_load_data_tbl_BACK_DATA",
-        application="s3a://asset/spark-jobs/daily_incremental_load_data_tbl_BACK_DATA.py",
+        task_id="daily_incremental_load_tbl_BACK_DATA",
+        application="s3a://asset/spark-jobs/daily_incremental_load_tbl_BACK_DATA.py",
         deploy_mode="cluster",
-        name="spark-daily_incremental_load_data_tbl_BACK_DATA",
+        name="spark-daily_incremental_load_tbl_BACK_DATA",
         conn_id="spark_k8s",
         conf={
             "spark.kubernetes.namespace": "compute",
