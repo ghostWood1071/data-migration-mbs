@@ -1,0 +1,38 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: front-data
+  namespace: cdc
+spec:
+  image: chiennc4805/flink-mbs:1.0.0
+  flinkVersion: v1_18
+  serviceAccount: flink   
+
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    state.backend: rocksdb
+    state.checkpoints.dir: s3a://warehouse/front_data/checkpoints
+    state.savepoints.dir:  s3a://warehouse/front_data/savepoints
+    execution.checkpointing.interval: "60s"
+    fs.s3a.endpoint: "http://minio.storage.svc.cluster.local:9000"
+    fs.s3a.access.key: "minioadmin"
+    fs.s3a.secret.key: "minio@demo!"
+    fs.s3a.path.style.access: "true"
+    fs.s3a.connection.ssl.enabled: "false"
+
+
+  jobManager:
+    resource:
+      cpu: 1
+      memory: "1024m"
+  taskManager:
+    resource:
+      cpu: 2
+      memory: "2048m"
+
+  job:
+    jarURI: local:///opt/flink/lib/streaming-starrocks-1.0-SNAPSHOT.jar
+    # jarURI: s3a://asset/flink-job/cdc-kafka-starrocks-1.0-SNAPSHOT.jar
+    entryClass: org.mbs.FrontData
+    parallelism: 2
+    upgradeMode: savepoint  
