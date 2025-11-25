@@ -1,23 +1,31 @@
 from pyspark.sql import SparkSession
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 spark = (
     SparkSession.builder
-                .appName("db2starrocks_transform_BACK_ACCOUNT")
+                .appName("daily_load_back_data_tbl_BACK_DATA")
                 .getOrCreate()
 )
 
-def get_data_from_starrocks(table_name: str,  partition_col: str = None, year: int = None):
+
+def get_data_from_starrocks(table_name: str,  partition_col: str = None, date: int = None):
+    if date is None:
+        tz = ZoneInfo("Asia/Ho_Chi_Minh")
+        date = datetime.now(tz).date() - timedelta(days=1)
+  
     df = (
         spark.read.format("starrocks")
             .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
             .option("starrocks.fe.jdbc.url", "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030")
             .option("starrocks.table.identifier", f"mbs_realtime_db.{table_name}")
-            .option("starrocks.filter.query", f"YEAR({partition_col}) = {year}")
+            .option("starrocks.filter.query", f"{partition_col} = {date}")
             .option("starrocks.user", "mbs_demo")
             .option("starrocks.password", "mbs_demo")
             .load()
     )
     return df
+
 
 def load_data_to_tbl_in_starrocks(transformed_df, table_name):
     (
@@ -27,23 +35,24 @@ def load_data_to_tbl_in_starrocks(transformed_df, table_name):
         .option("starrocks.table.identifier", f"mbs_golden.{table_name}")
         .option("starrocks.user", "mbs_demo")
         .option("starrocks.password", "mbs_demo")
-        .option("starrocks.read.max_string_length", "1048576")
         .mode("append")
         .save()
     )
 
 
-for year in range(2008, 2026):
-    fact_t_margin_extra_balance_his_df = get_data_from_starrocks("fact_t_margin_extra_balance_his", "partition_date", year)
-    fact_t_tlo_debit_balance_history_df = get_data_from_starrocks("fact_t_tlo_debit_balance_history", "partition_date", year)
-    fact_t_back_advance_withdraw_df = get_data_from_starrocks("fact_t_back_advance_withdraw", "C_WITHDRAW_DATE", year)
-    fact_t_back_deal_history_df = get_data_from_starrocks("fact_t_back_deal_history", "partition_date", year)
-    
-    fact_t_margin_extra_balance_his_df.createOrReplaceTempView("tv_fact_t_margin_extra_balance_his")
-    fact_t_tlo_debit_balance_history_df.createOrReplaceTempView("tv_fact_t_tlo_debit_balance_history")
-    fact_t_back_advance_withdraw_df.createOrReplaceTempView("tv_fact_t_back_advance_withdraw")
-    fact_t_back_deal_history_df.createOrReplaceTempView("tv_fact_t_back_deal_history")
-    transformed_df = spark.sql(f"""
+fact_t_margin_extra_balance_his_df = get_data_from_starrocks("fact_t_margin_extra_balance_his", "partition_date")
+fact_t_tlo_debit_balance_history_df = get_data_from_starrocks("fact_t_tlo_debit_balance_history", "partition_date")
+fact_t_back_advance_withdraw_df = get_data_from_starrocks("fact_t_back_advance_withdraw", "C_WITHDRAW_DATE")
+fact_t_back_deal_history_df = get_data_from_starrocks("fact_t_back_deal_history", "partition_date")
+
+fact_t_margin_extra_balance_his_df.createOrReplaceTempView("tv_fact_t_margin_extra_balance_his")
+fact_t_tlo_debit_balance_history_df.createOrReplaceTempView("tv_fact_t_tlo_debit_balance_history")
+fact_t_back_advance_withdraw_df.createOrReplaceTempView("tv_fact_t_back_advance_withdraw")
+fact_t_back_deal_history_df.createOrReplaceTempView("tv_fact_t_back_deal_history")
+
+
+sql = """
+	INSERT INTO mbs_golden.test_back_data
 	WITH 
 	margin_balance_hist AS (
 	SELECT
@@ -138,11 +147,16 @@ for year in range(2008, 2026):
 		END AS C_KY_KPI
 	FROM
 		OUTER_TABLE ot
-""")
-    load_data_to_tbl_in_starrocks(transformed_df, "back_data")
+"""
+
+
+url = "jdbc:mysql://kube-starrocks-fe-service.warehouse.svc.cluster.local:9030"
+user = "mbs_demo"
+password = "mbs_demo"
+
+spark._sc._gateway.jvm.java.sql.DriverManager.getConnection(
+	url, user, password
+).createStatement().execute(sql)
+
 
 spark.stop()
-
-
-
-
