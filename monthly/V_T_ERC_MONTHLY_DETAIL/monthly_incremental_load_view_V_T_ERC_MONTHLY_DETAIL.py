@@ -52,7 +52,7 @@ silver_df = (
 )
 
 ###---------------------------------INCREMENTAL LOAD DATA TO STARROCKS---------------------------------
-table_name = "test_fact_v_t_erc_monthly_detail"
+table_name = "fact_v_t_erc_monthly_detail"
 (
     silver_df.write.format("starrocks")
         .option("starrocks.fe.http.url", "http://kube-starrocks-fe-service.warehouse.svc.cluster.local:8030")
