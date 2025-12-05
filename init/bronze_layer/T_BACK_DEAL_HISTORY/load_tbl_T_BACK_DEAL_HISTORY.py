@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import current_timestamp
+from pyspark.sql.functions import to_date
 
 spark = (
     SparkSession.builder
@@ -10,7 +10,6 @@ spark = (
     .getOrCreate()
 )
 
-#database config to connect
 DATABASE_CONFIG = {
     "url": "jdbc:oracle:thin:@10.91.101.161:1521/tradingnkt",
     "user": "mispoc",
@@ -18,25 +17,21 @@ DATABASE_CONFIG = {
     "driver": "oracle.jdbc.driver.OracleDriver"
 }
 
-###---------------------------------READ DATA FROM ORACLE DB---------------------------------
-#
-T_BACK_DEAL_HISTORY_df = (
-    spark.read
-        .format("jdbc")
-        .option("url", DATABASE_CONFIG["url"])
-        .option("dbtable", "BACK.T_BACK_DEAL_HISTORY")
-        .option("user", DATABASE_CONFIG["user"])
-        .option("password", DATABASE_CONFIG["password"])
-        .option("driver", DATABASE_CONFIG["driver"])
-        .load()
-)
-#
-###
+def ETL_data_each_year(year):
+    T_BACK_DEAL_HISTORY_df = (
+        spark.read
+            .format("jdbc")
+            .option("url", DATABASE_CONFIG["url"])
+            .option("dbtable", f"(SELECT * FROM BACK.T_BACK_DEAL_HISTORY WHERE EXTRACT(YEAR FROM C_TRANSACTION_DATE) = {year}) tbl")
+            .option("user", DATABASE_CONFIG["user"])
+            .option("password", DATABASE_CONFIG["password"])
+            .option("driver", DATABASE_CONFIG["driver"])
+            .load()
+    )
+    transformed_df = T_BACK_DEAL_HISTORY_df.withColumn("partition_date", to_date("C_TRANSACTION_DATE", "yyyy-MM-dd"))
+    transformed_df.write.format("parquet").mode("overwrite").partitionBy("partition_date").save("s3a://warehouse/bronze/T_BACK_DEAL_HISTORY")
 
-###---------------------------------WRITE DATA TO BRONZE BUCKET IN MINIO---------------------------------
-#
-T_BACK_DEAL_HISTORY_df.write.format("parquet").mode("overwrite").save("s3a://warehouse/bronze/T_BACK_DEAL_HISTORY")
-#
-###
+for year in range(2008, 2026):
+    ETL_data_each_year(year)
 
 spark.stop()

@@ -6,7 +6,7 @@ import pendulum
 default_args = {"owner": "airflow", "retries": 0}
 
 with DAG(
-    dag_id="spark_daily_delete_all_tbl_T_FRONT_DEAL",
+    dag_id="spark_daily_delete_all_tbl_T_FRONT_DATA",
     start_date=pendulum.datetime(2025, 11, 17, tz="Asia/Ho_Chi_Minh"),
     schedule_interval="1 0 * * *",
     catchup=False,
@@ -14,10 +14,10 @@ with DAG(
 ) as dag:
 
     daily_delete_all = SparkSubmitOperator(
-        task_id="daily_delete_all_tbl_T_FRONT_DEAL",
-        application="s3a://asset/spark-jobs/daily_delete_all_tbl_T_FRONT_DEAL.py",
+        task_id="daily_delete_all_tbl_T_FRONT_DATA",
+        application="s3a://asset/spark-jobs/daily_delete_all_tbl_T_FRONT_DATA.py",
         deploy_mode="cluster",
-        name="spark-daily_delete_all_tbl_T_FRONT_DEAL",
+        name="spark-daily_delete_all_tbl_T_FRONT_DATA",
         conn_id="spark_k8s",
         conf={
             "spark.kubernetes.namespace": "compute",

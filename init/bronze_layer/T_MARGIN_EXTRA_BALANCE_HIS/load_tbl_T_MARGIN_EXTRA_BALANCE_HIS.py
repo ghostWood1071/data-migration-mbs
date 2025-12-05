@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import current_timestamp
+from pyspark.sql.functions import to_date
 
 spark = (
     SparkSession.builder
@@ -10,7 +10,6 @@ spark = (
     .getOrCreate()
 )
 
-#database config to connect
 DATABASE_CONFIG = {
     "url": "jdbc:oracle:thin:@10.91.101.161:1521/tradingnkt",
     "user": "mispoc",
@@ -18,25 +17,22 @@ DATABASE_CONFIG = {
     "driver": "oracle.jdbc.driver.OracleDriver"
 }
 
-###---------------------------------READ DATA FROM ORACLE DB---------------------------------
-#
-T_MARGIN_EXTRA_BALANCE_HIS_df = (
-    spark.read
-        .format("jdbc")
-        .option("url", DATABASE_CONFIG["url"])
-        .option("dbtable", "BACK.T_MARGIN_EXTRA_BALANCE_HIS")
-        .option("user", DATABASE_CONFIG["user"])
-        .option("password", DATABASE_CONFIG["password"])
-        .option("driver", DATABASE_CONFIG["driver"])
-        .load()
-)
-#
-###
+def ETL_data_each_year(year):
+    T_MARGIN_EXTRA_BALANCE_HIS_df = (
+        spark.read
+            .format("jdbc")
+            .option("url", DATABASE_CONFIG["url"])
+            .option("dbtable", f"(SELECT * FROM BACK.T_MARGIN_EXTRA_BALANCE_HIS WHERE EXTRACT(YEAR FROM C_TRADING_DATE) = {year}) tbl")
+            .option("user", DATABASE_CONFIG["user"])
+            .option("password", DATABASE_CONFIG["password"])
+            .option("driver", DATABASE_CONFIG["driver"])
+            .load()
+    )
+    transformed_df = T_MARGIN_EXTRA_BALANCE_HIS_df.withColumn("partition_date", to_date("C_APPROVE_TIME", "yyyy-MM-dd"))
+    transformed_df.write.format("parquet").mode("append").partitionBy("partition_date").save("s3a://warehouse/bronze/T_MARGIN_EXTRA_BALANCE_HIS")
 
-###---------------------------------WRITE DATA TO BRONZE BUCKET IN MINIO---------------------------------
-#
-T_MARGIN_EXTRA_BALANCE_HIS_df.write.format("parquet").mode("overwrite").save("s3a://warehouse/bronze/T_MARGIN_EXTRA_BALANCE_HIS")
-#
-###
+for year in range(2016, 2026):
+    ETL_data_each_year(year)
+
 
 spark.stop()
